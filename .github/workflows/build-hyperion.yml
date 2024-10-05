@@ -1,21 +1,12 @@
 name: Build hyperion
 
 on:
-  schedule:
-    - cron: '30 21 * * *'  # 9:30pm everyday
   pull_request:
     branches:
       - main
     paths-ignore:
       - 'README*'
       - '*.md'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README*'
-      - '*.md'
-
   workflow_run:
     workflows: ["Build image"]
     branches: [main]
