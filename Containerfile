@@ -3,7 +3,7 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 
 # copy yum repos
 ADD /repos /tmp/repos
-RUN rsync -avh /tmp/repos/ /etc/yum.repos.d/
+RUN rsync -vh /tmp/repos/ /etc/yum.repos.d/
 
 # install pacakges
 RUN rpm-ostree install --idempotent \
@@ -68,7 +68,7 @@ RUN rpm-ostree install --idempotent \
 
 # sync rootfs
 ADD /rootfs /tmp/rootfs
-RUN rsync -avh /tmp/rootfs/ /
+RUN rsync -vh /tmp/rootfs/ /
 
 # add scripts
 ADD /scripts /tmp/scripts
