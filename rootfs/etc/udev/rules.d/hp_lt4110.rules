@@ -1,0 +1,1 @@
+ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="931d", ATTR{bConfigurationValue}!="3", RUN+="/bin/sh -c 'echo 3 > %S%p/bConfigurationValue'"

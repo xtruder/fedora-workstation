@@ -1,0 +1,8 @@
+[tuxedo]
+baseurl = https://rpm.tuxedocomputers.com/fedora/$releasever/x86_64/base
+enabled = 1
+exclude = tuxedo-drivers tuxedo-keyboard
+gpgcheck = 1
+gpgkey = https://rpm.tuxedocomputers.com/fedora/$releasever/0x54840598.pub.asc
+name = tuxedo
+skip_if_unavailable = 0

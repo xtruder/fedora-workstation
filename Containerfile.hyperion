@@ -1,0 +1,7 @@
+ARG FEDORA_MAJOR_VERSION=40
+FROM ghcr.io/xtruder/fedora-workstation:${FEDORA_MAJOR_VERSION}
+
+RUN /tmp/scripts/install_tuxedo.sh && \
+    /tmp/scripts/install_rocm.sh
+
+RUN /tmp/ostree_commit.sh
