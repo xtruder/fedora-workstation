@@ -30,6 +30,16 @@ install-tuxedo:
 
     sudo systemctl mask power-profiles-daemon.service
 
+# Builds and installs akmods-keys package with current akmod keys
+akmods-keys:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if ! rpm -q akmods-keys &>/dev/null; then
+        cd {{ current_dir }}/silverblue-akmods-keys
+        sudo bash setup.sh
+        sudo rpm-ostree install akmods-keys-0.0.2-8.fc$(rpm -E %fedora).noarch.rpm
+    fi
 
 # Ensure ~/.local/bin exists
 @_ensure-local-bin:
