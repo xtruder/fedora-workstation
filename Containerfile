@@ -22,6 +22,7 @@ RUN rpm-ostree install --idempotent \
         wireguard-tools \
         android-tools \
         python3-pip \
+        just \
     # bench \
         stress-ng \
         s-tui \
