@@ -2,8 +2,7 @@ ARG FEDORA_MAJOR_VERSION=40
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 
 # copy yum repos
-ADD /repos /tmp/repos
-RUN rsync -avh --no-perms --chown=root:root /tmp/repos/ /etc/yum.repos.d/
+ADD /repos /etc/yum.repos.d/
 
 # install pacakges
 RUN rpm-ostree install --idempotent \
@@ -64,11 +63,17 @@ RUN rpm-ostree install --idempotent \
         pass \
         qtpass \
     # dev \
-        code
+        code \
+    # ml \
+        rocm-clinfo rocminfo rocm-smi
 
 # sync rootfs
-ADD /rootfs /tmp/rootfs
-RUN rsync -avh --no-perms --chown=root:root /tmp/rootfs/ /
+ADD /rootfs /
 
 # add scripts
 ADD /scripts /tmp/scripts
+
+
+RUN rm -rf /tmp/* /var/* &&
+    rpm-ostree cleanup -m &&
+    ostree container commit
