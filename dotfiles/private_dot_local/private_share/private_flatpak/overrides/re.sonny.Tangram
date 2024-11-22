@@ -1,0 +1,6 @@
+[Context]
+sockets=!x11
+filesystems=xdg-documents;xdg-download
+
+[Environment]
+PS1=\$

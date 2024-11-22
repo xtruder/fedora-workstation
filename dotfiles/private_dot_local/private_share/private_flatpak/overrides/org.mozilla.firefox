@@ -1,0 +1,7 @@
+[Context]
+sockets=session-bus;!x11
+devices=undefined;dri
+filesystems=xdg-documents;xdg-pictures;xdg-public-share
+
+[Environment]
+MOZ_ENABLE_WAYLAND=1

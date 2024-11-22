@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# downloads cursor appimage if it doesn't exist yet
+if [ ! -f ~/.local/bin/cursor.AppImage ]; then
+  curl -Lo ~/.local/bin/cursor.AppImage https://downloader.cursor.sh/linux/appImage/x64
+  chmod +x ~/.local/bin/cursor.AppImage
+fi
+
+nohup ~/.local/bin/cursor.AppImage "$@" > ~/.cursor_log 2>&1 &

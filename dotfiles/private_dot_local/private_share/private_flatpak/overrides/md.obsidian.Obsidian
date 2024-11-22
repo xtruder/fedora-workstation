@@ -1,0 +1,5 @@
+[Context]
+sockets=fallback-x11;wayland;!x11
+
+[Environment]
+OBSIDIAN_USE_WAYLAND=1

@@ -22,7 +22,8 @@ RUN rpm-ostree install --idempotent \
         wireguard-tools \
         android-tools \
         python3-pip \
-        just \
+        make \
+        gnupg2 \
     # bench \
         stress-ng \
         s-tui \
@@ -67,6 +68,11 @@ RUN rpm-ostree install --idempotent \
         code \
     # ml \
         rocm-clinfo rocminfo rocm-smi
+
+RUN sudo systemctl enable \
+    usbguard.service \
+    usbguard-dbus.service \
+    incus.socket
 
 # sync rootfs
 ADD /rootfs /

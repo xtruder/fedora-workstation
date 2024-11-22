@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# default flatpak packages
+default=(
+    com.github.tchx84.Flatseal
+    org.mozilla.firefox
+    io.github.ungoogled_software.ungoogled_chromium
+    io.github.ungoogled_software.ungoogled_chromium.Codecs
+    com.transmissionbt.Transmission
+)
+
+work=(
+    com.logseq.Logseq
+    md.obsidian.Obsidian
+    us.zoom.Zoom
+    org.remmina.Remmina
+    org.wireshark.Wireshark
+    org.torproject.torbrowser-launcher
+    com.github.jeromerobert.pdfarranger
+    com.github.maoschanz.drawing
+    com.github.xournalpp.xournalpp
+    com.nextcloud.desktopclient.nextcloud
+)
+
+crypt=(
+    org.getmonero.Monero
+    io.exodus.Exodus
+)
+
+gaming=(
+    com.parsecgaming.parsec
+    com.valvesoftware.Steam
+    com.valvesoftware.Steam.CompatibilityTool.Proton
+    com.valvesoftware.Steam.CompatibilityTool.Proton-GE
+)
+
+multimedia=(
+    org.videolan.VLC
+    org.gimp.GIMP
+    com.github.iwalton3.jellyfin-media-player
+)
+
+flatpaks=("${default[@]}")
+
+{{- if .work }}
+flatpaks+=("${work[@]}")
+{{- end }}
+
+{{- if .multimedia }}
+flatpaks+=("${multimedia[@]}")
+{{- end }}
+
+{{- if .crypto}}
+flatpaks+=("${crypto[@]}")
+{{- end }}
+
+{{- if .gaming }}
+flatpaks+=("${gaming[@]}")
+{{- end }}
+
+flatpak install --user --noninteractive --assumeyes flathub "${flatpaks[@]}"
