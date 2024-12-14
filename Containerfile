@@ -1,4 +1,4 @@
-ARG FEDORA_MAJOR_VERSION=40
+ARG FEDORA_MAJOR_VERSION=41
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 
 # copy yum repos
@@ -59,7 +59,7 @@ RUN rpm-ostree install --idempotent \
         pam_yubico \
         nyx \
         tor \
-    # pip deps
+    # pip deps \
         python3-devel \
         python3-tkinter \
         libusb1-devel \
@@ -73,7 +73,7 @@ RUN rpm-ostree install --idempotent \
     # dev \
         code \
     # ml \
-        rocm-clinfo rocminfo rocm-smi
+        rocminfo rocm-smi
 
 RUN sudo systemctl enable \
     usbguard.service \

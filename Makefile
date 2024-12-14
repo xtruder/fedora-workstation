@@ -38,11 +38,10 @@ chezmoi-init: $(cmd_chezmoi)
 ## install-tuxedo: Install and configure Tuxedo software
 .PHONY: install-tuxedo
 install-tuxedo:
-	sudo rpm-ostree install --idempotent tuxedo-control-center tuxedo-drivers
+	sudo rpm-ostree install --idempotent tuxedo-control-center akmod-tuxedo-drivers
 	sudo mkdir -p /etc/xdg/autostart
 	sudo ln -fs /usr/etc/skel/.config/autostart/tuxedo-control-center-tray.desktop \
 		/etc/xdg/autostart/tuxedo-control-center-tray.desktop
-	sudo systemctl mask power-profiles-daemon.service
 
 ## build-akmods-keys: Build akmods-keys package
 $(akmods_keys_rpm):
