@@ -1,4 +1,7 @@
 [Context]
 sockets=fallback-x11;!x11
 devices=dri
-filesystems=xdg-download;xdg-config/chromium;xdg-videos:ro;xdg-pictures:ro;~/.local/share/applications;~/.local/share/icons;xdg-config/chromium-flags.conf:ro;!home
+filesystems=xdg-config/chromium-flags.conf:ro;~/.local/share/icons;~/.local/share/applications;xdg-pictures:ro;xdg-videos:ro;xdg-config/chromium;xdg-download;!home
+
+[Environment]
+ELECTRON_OZONE_PLATFORM_HINT=auto

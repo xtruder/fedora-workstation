@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Trezor Suite
+Exec=trezor-suite
+Terminal=false
+Type=Application
+Icon=trezor-suite
+StartupWMClass=@trezor/suite-desktop
+X-AppImage-Version=latest
+Comment=Trezor Suite desktop application
+MimeType=x-scheme-handler/bitcoin;
+Categories=Utility;

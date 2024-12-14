@@ -59,6 +59,12 @@ RUN rpm-ostree install --idempotent \
         pam_yubico \
         nyx \
         tor \
+    # pip deps
+        python3-devel \
+        python3-tkinter \
+        libusb1-devel \
+        libudev-devel \
+        gcc \
     # password manager \
         1password \
         1password-cli \

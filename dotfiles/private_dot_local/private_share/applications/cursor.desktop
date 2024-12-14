@@ -1,10 +1,10 @@
 [Desktop Entry]
 Name=Cursor
-Exec=cursor --ozone-platform-hint=auto %F
+Exec=cursor %F
 Terminal=false
 Type=Application
 Icon=cursor
-StartupWMClass=Cursor
+StartupWMClass=cursor-url-handler
 X-AppImage-Version=latest
 Comment=Cursor is an AI-first coding environment.
 MimeType=x-scheme-handler/cursor;

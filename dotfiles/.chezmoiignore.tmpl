@@ -15,3 +15,7 @@ Ryujinx.svg
 .config/suyu
 .local/share/suyu
 {{ end }}
+
+{{ if not .crypto }}
+trezor-suite.desktop
+{{ end }}

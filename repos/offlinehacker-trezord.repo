@@ -1,7 +1,0 @@
-[copr:copr.fedorainfracloud.org:offlinehacker:trezord]
-baseurl = https://download.copr.fedorainfracloud.org/results/offlinehacker/trezord/fedora-$releasever-$basearch/
-enabled = 1
-gpgcheck = 1
-gpgkey = https://download.copr.fedorainfracloud.org/results/offlinehacker/trezord/pubkey.gpg
-name = Copr repo for trezord owned by offlinehacker
-skip_if_unavailable = 0
