@@ -123,9 +123,9 @@ modules:
         - usbguard-dbus.service
         - incus.socket
 
-  - type: akmods
-    base: main
-    install: []
+  # - type: akmods
+  #   base: main
+  #   install: []
 
   - type: justfiles
     validate: true
