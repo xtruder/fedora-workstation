@@ -134,6 +134,8 @@ modules:
       - install-tuxedo.just
 
   - type: chezmoi
-    repo: https://github.com/xtruder/fedora-workstation
+    repository: https://github.com/xtruder/fedora-workstation
+    branch: main
+    all-users: false # users manually enable dotfiles using systemctl enable --user chezmoi-init.service chezmoi-update.timer
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
