@@ -133,4 +133,7 @@ modules:
       - akmod-keys.just
       - install-tuxedo.just
 
+  - type: chezmoi
+    repo: https://github.com/xtruder/fedora-workstation
+
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
