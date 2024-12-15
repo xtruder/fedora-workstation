@@ -1,6 +1,8 @@
 default:
   @just --list
 
-build:
-    bluebuild generate ./recipes/recipe.yml -o Containerfile
-    bluebuild build ./recipes/recipe.yml
+generate:
+  bluebuild generate ./recipes/recipe.yml -o Containerfile
+
+build: generate
+  bluebuild build ./recipes/recipe.yml
