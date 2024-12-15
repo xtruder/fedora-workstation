@@ -1,0 +1,136 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# image will be published to ghcr.io/<user>/<name>
+name: fedora-workstation
+# description will be included in the image's metadata
+description: This is my personal OS image.
+
+# the base image to build on top of (FROM) and the version tag to use
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: 41 # latest is also supported if you want new updates ASAP
+
+# module configuration, executed in order
+# you can include multiple instances of the same module
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+
+  - type: rpm-ostree
+    repos:
+      - tuxedo.repo
+      - microsoft-vscode.repo
+      - ganto-lxc4-incus.repo
+      - tuxedo.repo
+      - tuxedo-drivers-kmod.repo
+    install:
+      - htop
+      - vim-common
+      - ncdu
+      - unrar
+      - unzip
+      - p7zip
+      - procps
+      - akmods
+      - bcc
+      - strace
+      - nmap
+      - smartmontools
+      - wireguard-tools
+      - android-tools
+      - python3-pip
+      - make
+      - gnupg2
+    # bench
+      - stress-ng
+      - s-tui
+    # gui
+      - NetworkManager-l2tp
+      - NetworkManager-l2tp-gnome
+      - gnome-tweak-tool
+      - ulauncher
+      - gnome-shell-extension-pop-shell
+      - simple-scan
+    # fs
+      - fscrypt
+      - davfs2
+      - sirikali
+    # networking
+      - tailscale
+    # system
+      - usbguard
+      - usbguard-dbus
+      - powertop
+    # virt / containers
+      - incus
+      - edk2-ovmf
+      - edk2-aarch64
+      - qemu-img
+      - qemu-kvm
+      - podman
+      - podman-compose
+      - containernetworking-plugins
+    # cypto
+      - pcsc-tools
+      - libykneomgr
+      - pam_yubico
+      - nyx
+      - tor
+    # pip deps
+      - python3-devel
+      - python3-tkinter
+      - libusb1-devel
+      - libudev-devel
+      - gcc
+    # password manager
+      - pass
+      - qtpass
+    # dev
+      - code
+    # ml
+      - rocminfo
+      - rocm-smi
+
+    remove:
+      # example: removing firefox (in favor of the flatpak)
+      # "firefox" is the main package, "firefox-langpacks" is a dependency
+      - firefox
+      - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+
+  - type: bling
+    install:
+      - 1password
+      - dconf-update-service
+
+  - type: default-flatpaks
+    notify: true # Send notification after install/uninstall is finished (true/false)
+    system:
+      # If no repo information is specified, Flathub will be used by default
+      install:
+        - org.mozilla.firefox
+        - org.gnome.Loupe
+      remove:
+        - org.gnome.eog
+    user: {} # Also add Flathub user repo, but no user packages
+
+  - type: systemd
+    system:
+      disabled:
+        - flatpak-system-update.timer
+      enabled:
+        - usbguard.service
+        - usbguard-dbus.service
+        - incus.socket
+
+  - type: akmods
+    base: main
+    install: []
+
+  - type: justfiles
+    validate: true
+    include:
+      - akmod-keys.just
+      - install-tuxedo.just
+
+  - type: signing # this sets up the proper policy & signing files for signed images to work fully
