@@ -25,6 +25,7 @@ modules:
       - tuxedo.repo
       - tuxedo-drivers-kmod.repo
     install:
+    # system
       - htop
       - vim-common
       - ncdu
@@ -35,13 +36,18 @@ modules:
       - akmods
       - bcc
       - strace
-      - nmap
       - smartmontools
+      - acpica-tools
       - wireguard-tools
       - android-tools
       - python3-pip
+      - python-systemd
       - make
       - gnupg2
+      - rpmdevtools
+      - usbguard
+      - usbguard-dbus
+      - powertop
     # bench
       - stress-ng
       - s-tui
@@ -58,10 +64,6 @@ modules:
       - sirikali
     # networking
       - tailscale
-    # system
-      - usbguard
-      - usbguard-dbus
-      - powertop
     # virt / containers
       - incus
       - edk2-ovmf
@@ -71,6 +73,15 @@ modules:
       - podman
       - podman-compose
       - containernetworking-plugins
+      - waydroid
+
+      # libvirt stuff
+      - libvirt-daemon-config-network
+      - libvirt-daemon-kvm
+      - virt-install
+      - virt-manager
+      - virt-top
+      - virt-viewer
     # cypto
       - pcsc-tools
       - libykneomgr
@@ -91,6 +102,10 @@ modules:
     # ml
       - rocminfo
       - rocm-smi
+    # security
+      - aircrack-ng
+      - nmap
+      - wireshark-cli
 
     remove:
       # example: removing firefox (in favor of the flatpak)
