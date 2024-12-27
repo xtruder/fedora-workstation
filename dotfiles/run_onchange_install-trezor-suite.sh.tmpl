@@ -2,14 +2,14 @@
 
 set -euxo pipefail
 
-VERSION=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/trezor/trezor-suite/releases/latest)
-VERSION=${VERSION##*/}
-DOWNLOAD_URL="https://github.com/trezor/trezor-suite/releases/download/v${VERSION}/Trezor-Suite-${VERSION}-linux-arm64.AppImage"
+VERSION="24.12.3"
+DOWNLOAD_URL="https://github.com/trezor/trezor-suite/releases/download/v${VERSION}/Trezor-Suite-${VERSION}-linux-amd64.AppImage"
 
-# downloads trezor-suite appimage if it doesn't exist yet
+# download trezor-suite appimage
 mkdir -p ~/.local/share/libexec
 curl -Lo ~/.local/share/libexec/trezor-suite.AppImage "$DOWNLOAD_URL"
 
+# verify trezor-suite appimage signature
 curl -Lo ~/.local/share/libexec/trezor-suite.AppImage.asc "$DOWNLOAD_URL.asc"
 curl https://trezor.io/security/satoshilabs-2021-signing-key.asc | gpg2 --import
 gpg2 --verify ~/.local/share/libexec/trezor-suite.AppImage.asc ~/.local/share/libexec/trezor-suite.AppImage
