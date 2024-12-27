@@ -1,12 +1,3 @@
 #!/usr/bin/env bash
 
-DOWNLOAD_URL="https://data.trezor.io/suite/releases/desktop/latest/Trezor-Suite-24.11.3-linux-x86_64.AppImage"
-
-# downloads trezor-suite appimage if it doesn't exist yet
-if [ ! -f ~/.local/share/libexec/trezor-suite.AppImage ]; then
-  mkdir -p ~/.local/share/libexec
-  curl -Lo ~/.local/share/libexec/trezor-suite.AppImage "$DOWNLOAD_URL"
-  chmod +x ~/.local/share/libexec/trezor-suite.AppImage
-fi
-
 nohup ~/.local/share/libexec/trezor-suite.AppImage "$@" > ~/.trezor_suite_log 2>&1 &
