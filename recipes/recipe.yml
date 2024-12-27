@@ -36,6 +36,7 @@ modules:
       - akmods
       - bcc
       - strace
+      - zenity
       - smartmontools
       - acpica-tools
       - wireguard-tools
