@@ -3,21 +3,18 @@
 set -euxo pipefail
 
 # Install gnome extensions
-declare -A extensions=(
-    ["system-monitor-next@paradoxxx.zero.gmail.com"]="75"
-    ["appindicatorsupport@rgcjonas.gmail.com"]="59"
-    ["space-bar@luchrioh"]="32"
-    ["nightthemeswitcher@romainvigier.fr"]="78"
+extensions=(
+    "system-monitor-next@paradoxxx.zero.gmail.com"
+    "appindicatorsupport@rgcjonas.gmail.com"
+    "space-bar@luchrioh"
+    "nightthemeswitcher@romainvigier.fr"
 )
 
-for name in "${!extensions[@]}"; do
-    # Skip if extension is already installed
-    if gnome-extensions info "$name" &>/dev/null; then
-        echo "Extension $name is already installed"
-        continue
-    fi
-
-    version="${extensions[$name]}"
+for name in "${extensions[@]}"; do
+    # Get latest version from extensions.gnome.org
+    version=$(curl -s "https://extensions.gnome.org/extension-info/?uuid=$name" | \
+        jq -r '.shell_version_map | to_entries | max_by(.key) | .value.version')
     url="https://extensions.gnome.org/extension-data/${name//@/}.v${version}.shell-extension.zip"
-    gnome-extensions install "$url"
+
+    gnome-extensions install --force "$url"
 done
