@@ -2,7 +2,8 @@
 
 set -euxo pipefail
 
-VERSION="24.12.3"
+VERSION=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/trezor/trezor-suite/releases/latest)
+VERSION=${VERSION##*/}
 DOWNLOAD_URL="https://github.com/trezor/trezor-suite/releases/download/v${VERSION}/Trezor-Suite-${VERSION}-linux-arm64.AppImage"
 
 # downloads trezor-suite appimage if it doesn't exist yet
