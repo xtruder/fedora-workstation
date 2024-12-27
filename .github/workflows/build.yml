@@ -7,6 +7,7 @@ on:
   push:
     paths-ignore:
       - "**.md" # don't rebuild if only documentation has changed
+      - dotfiles/** # don't rebuild if only dotfiles have changed
 
   pull_request:
   workflow_dispatch: # allow manually triggering builds
