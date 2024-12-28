@@ -4,10 +4,19 @@ set -euxo pipefail
 
 # Install gnome extensions
 extensions=(
+    # System monitor, this is a fork of gnome-shell-extension-system-monitor
     "system-monitor-next@paradoxxx.zero.gmail.com"
     "appindicatorsupport@rgcjonas.gmail.com"
+
+    # Most awesome workspace switcher
     "space-bar@luchrioh"
+
+    # Enables switching between light and dark themes using keybinding or based on system theme
     "nightthemeswitcher@romainvigier.fr"
+
+    # For gtk3 based apps like firefox gnome will not automatically switch to dark mode
+    # so we need to install this extension to switch to dark mode when firefox is in dark mode
+    "legacyschemeautoswitcher@joshimukul29.gmail.com"
 )
 
 for name in "${extensions[@]}"; do
