@@ -1,5 +1,0 @@
-[Context]
-filesystems=~/Downloads;~/.local/share/flatpak/files/io.webtorrent.WebTorrent
-
-[Session Bus Policy]
-org.freedesktop.Flatpak=talk
