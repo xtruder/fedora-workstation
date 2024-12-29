@@ -24,6 +24,7 @@ modules:
       - ganto-lxc4-incus.repo
       - tuxedo.repo
       - tuxedo-drivers-kmod.repo
+      - pgdev-ghostty-fedora-41.repo
     install:
     # system
       - htop
@@ -59,6 +60,7 @@ modules:
       - ulauncher
       - gnome-shell-extension-pop-shell
       - simple-scan
+      - ghostty
     # fs
       - fscrypt
       - davfs2
