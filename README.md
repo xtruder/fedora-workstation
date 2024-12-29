@@ -27,3 +27,11 @@ To update dotfiles after you can run:
 ```sh
 chezmoi update
 ```
+
+## Post install
+
+- Login to 1password
+- Create profiles in ZEN browser and login with firefox accounts
+- Setup nextcloud sync
+
+### Create incus development VMs
