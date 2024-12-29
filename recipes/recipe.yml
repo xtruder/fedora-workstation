@@ -148,6 +148,7 @@ modules:
     include:
       - akmod-keys.just
       - install-tuxedo.just
+      - dotfiles.just
 
   - type: chezmoi
     repository: https://github.com/xtruder/fedora-workstation
