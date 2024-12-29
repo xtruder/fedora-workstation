@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
 # default flatpak packages
 default=(
     com.github.tchx84.Flatseal
-    org.mozilla.firefox
+    io.github.zen_browser.zen
     io.github.ungoogled_software.ungoogled_chromium
     io.github.ungoogled_software.ungoogled_chromium.Codecs
     com.transmissionbt.Transmission
@@ -13,6 +15,7 @@ work=(
     com.logseq.Logseq
     md.obsidian.Obsidian
     us.zoom.Zoom
+    com.slack.Slack
     org.remmina.Remmina
     org.wireshark.Wireshark
     org.torproject.torbrowser-launcher
@@ -30,7 +33,6 @@ crypt=(
 gaming=(
     com.parsecgaming.parsec
     com.valvesoftware.Steam
-    com.valvesoftware.Steam.CompatibilityTool.Proton
     com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 )
 
