@@ -16,5 +16,14 @@ sudo rpm-ostree rebase --reboot ostree-image-signed:docker://ghcr.io/xtruder/fed
 ## Dotfiles
 
 ```sh
-systemctl enable --user --now chezmoi-init.service
+ujust dotfiles
+```
+
+This will run `chezmoi init`, which will clone dotfiles to `~/.local/share/chezmoi` and run
+initial apply.
+
+To update dotfiles after you can run:
+
+```sh
+chezmoi update
 ```
