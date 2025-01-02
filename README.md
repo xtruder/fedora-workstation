@@ -31,7 +31,19 @@ chezmoi update
 ## Post install
 
 - Login to 1password
-- Create profiles in ZEN browser and login with firefox accounts
+- Setup firefox (most of changes with auto sync on existing account)
+  - Create firefox profiles
+  - Login with firefox accounts
+  - Configure basics
+  - Install extensions:
+    - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
+    - darkreader
+    - ublock origin
+    - 1password
+    - window titler
+    - ClearURLs
+    - Link to text Fragment
+  - Enable auto switching on dark reader
+  - Create containers Work/Personal
+  - Login to websites (in Persona/Work profiles and associated containers): Mail, Youtube, Youtube music
 - Setup nextcloud sync
-
-### Create incus development VMs
