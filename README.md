@@ -35,6 +35,10 @@ chezmoi update
   - Create firefox profiles
   - Login with firefox accounts
   - Configure basics
+    - Reopen windows/tabs on restart
+    - Set desktop theme (auto switch)
+    - Enable HTTPS only
+    - Enable hardware accelerated playback using `media.ffmpeg.vaapi.enabled` (also sync via `services.sync.prefs.sync-seen.media.ffmpeg.vaapi.enabled`)
   - Install extensions:
     - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
     - darkreader
