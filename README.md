@@ -63,7 +63,17 @@ Add yourself to `incus-admin` group and restart your session.
 ```sh
 grep -E '^incus-admin:' /usr/etc/group | sudo tee -a /etc/group
 sudo usermod -a -G incus-admin offlinehq
-newgrp offlinehq
+newgrp incus-admin
+```
+
+Setup subid/subgid mappings
+
+```sh
+sudo usermod --add-subuids 524288-65536 offlinehq
+sudo usermod --add-subuids 1000000-1000000000 root
+
+sudo usermod --add-subgids 524288-65536 offlinehq
+sudo usermod --add-subgids 1000000-1000000000 root
 ```
 
 Create incus dev container
