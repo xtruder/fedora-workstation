@@ -89,8 +89,31 @@ Add code directory to container
 incus config device add ubuntu-dev code disk source=/var/home/offlinehq/Code path=/home/offlinehq/Code shift=true
 ```
 
+Add SSH key to container
+
+```sh
+incus file push ~/.ssh/id_ed25519.pub ubuntu-dev/home/offlinehq/.ssh/authorized_keys --create-dirs --mode 0600
+```
+
+Add to SSH config
+
+```sh
+# Add/update SSH config entry
+IP=$(incus list ubuntu-dev -f json | jq -r '.[0].state.network.eth0.addresses[] | select(.family=="inet").address')
+cat >> ~/.ssh/config << EOF
+Host ubuntu-dev
+    HostName $IP
+    ForwardAgent yes
+    RemoteForward /run/user/1000/gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra
+EOF
+```
+
 Login to container
 
 ```sh
+# Via exec
 incus exec ubuntu-dev -- bash
+
+# Or via SSH (after adding SSH key)
+ssh ubuntu-dev
 ```
