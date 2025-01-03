@@ -31,23 +31,56 @@ chezmoi update
 ## Post install
 
 - Login to 1password
-- Setup firefox (most of changes with auto sync on existing account)
-  - Create firefox profiles
-  - Login with firefox accounts
-  - Configure basics
-    - Reopen windows/tabs on restart
-    - Set desktop theme (auto switch)
-    - Enable HTTPS only
-    - Enable hardware accelerated playback using `media.ffmpeg.vaapi.enabled` (also sync via `services.sync.prefs.sync-seen.media.ffmpeg.vaapi.enabled`)
-  - Install extensions:
-    - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
-    - darkreader
-    - ublock origin
-    - 1password
-    - window titler
-    - ClearURLs
-    - Link to text Fragment
-  - Enable auto switching on dark reader
-  - Create containers Work/Personal
-  - Login to websites (in Persona/Work profiles and associated containers): Mail, Youtube, Youtube music
 - Setup nextcloud sync
+
+### Setup firefox
+
+Note: most of changes with auto sync on existing account
+
+- Create firefox profiles
+- Login with firefox accounts
+- Configure basics
+  - Reopen windows/tabs on restart
+  - Set desktop theme (auto switch)
+  - Enable HTTPS only
+  - Enable hardware accelerated playback using `media.ffmpeg.vaapi.enabled` (also sync via `services.sync.prefs.sync-seen.media.ffmpeg.vaapi.enabled`)
+- Install extensions:
+  - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
+  - darkreader
+  - ublock origin
+  - 1password
+  - window titler
+  - ClearURLs
+  - Link to text Fragment
+- Enable auto switching on dark reader
+- Create containers Work/Personal
+- Login to websites (in Persona/Work profiles and associated containers): Mail, Youtube, Youtube music
+
+### Setup incus dev container
+
+Add yourself to `incus-admin` group and restart your session.
+
+```sh
+grep -E '^incus-admin:' /usr/etc/group | sudo tee -a /etc/group
+sudo usermod -a -G incus-admin offlinehq
+newgrp offlinehq
+```
+
+Create incus dev container
+
+```sh
+incus create images:ubuntu/24.04/cloud --profile ubuntu-dev ubuntu-dev
+incus start ubuntu-dev
+```
+
+Add code directory to container
+
+```sh
+incus config device add ubuntu-dev code disk source=/var/home/offlinehq/Code path=/home/offlinehq/Code shift=true
+```
+
+Login to container
+
+```sh
+incus exec ubuntu-dev -- bash
+```
