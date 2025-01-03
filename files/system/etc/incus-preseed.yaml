@@ -12,11 +12,9 @@
       project: default
 
     storage_pools:
-    - config:
-        source: /var/lib/incus/storage-pools/default
-      description: ""
+    - description: "Default storage pool"
       name: default
-      driver: dir
+      driver: btrfs
 
     profiles:
     - config: {}
@@ -48,43 +46,27 @@
             - wget
             - make
             - unzip
-            - nix-bin
-            - direnv
             - openssh-server
             - docker.io
-            - docker-compose
-            - golang-go
-            - nodejs
-            - python3
-            - python3-dev
-            - python3-pip
-            - pipx
+            - build-essential
           # add user
           users:
           - name: default
-          - name: {{ incus_profile_user }}
+          - name: offlinehq
             sudo: ALL=(ALL) NOPASSWD:ALL
             groups: users
             shell: /bin/bash
           ssh_pwauth: True
           chpasswd:
             list: |
-              {{ incus_profile_user }}:password
+              offlinehq:password
           locale: en_US.UTF-8
           timezone: Europe/Ljubljana
-          write_files:
-          - path: /etc/nix/nix.conf
-            content: |
-              # see https://nixos.org/nix/manual/#sec-conf-file
-              sandbox = true
-              experimental-features = nix-command flakes
           runcmd:
-          - usermod -a -G nix-users,docker {{ incus_profile_user }}
-          - systemctl enable nix-daemon.socket ssh.service
-          - systemctl start nix-daemon.socket ssh.service
-          - cp /usr/share/doc/nix-bin/examples/nix-profile-daemon.sh /etc/profile.d/nix-profile-daemon.sh
-          - sudo -H -u {{ incus_profile_user }} git clone https://github.com/offlinehacker/dotfiles.git /home/{{incus_profile_user}}/dotfiles
-          - sudo -H -u {{ incus_profile_user }} bash /home/{{incus_profile_user}}/dotfiles/install.sh
+          - usermod -a -G docker offlinehq
+          - sudo -H -u offlinehq bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          - sudo -H -u offlinehq git clone https://github.com/offlinehacker/dotfiles.git /home/offlinehq/dotfiles
+          - sudo -H -u offlinehq bash /home/offlinehq/dotfiles/install.sh
       description: ubuntu-dev profile
       devices:
         eth0:
