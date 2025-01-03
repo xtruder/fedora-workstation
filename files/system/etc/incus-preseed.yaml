@@ -31,7 +31,6 @@
       name: default
 
     - config:
-        raw.idmap: both 1000 1000
         security.nesting: "true"
         user.user-data: |
           #cloud-config
