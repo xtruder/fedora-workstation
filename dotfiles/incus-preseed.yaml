@@ -1,0 +1,92 @@
+config: {}
+
+networks:
+- config:
+    ipv4.address: 10.227.60.1/24
+    ipv4.nat: "true"
+    ipv6.address: fd42:49ed:2bf3:f0ad::1/64
+    ipv6.nat: "true"
+  description: ""
+  name: incusbr0
+  type: bridge
+  project: default
+
+storage_pools:
+- description: "Default storage pool"
+  name: default
+  driver: btrfs
+  config:
+    source: /var/lib/incus/storage-pools/default
+
+profiles:
+- config: {}
+  description: Default Incus profile
+  devices:
+    eth0:
+      name: eth0
+      network: incusbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: default
+
+- config:
+    security.nesting: "true"
+    user.user-data: |
+      #cloud-config
+      package_upgrade: true
+      packages:
+        - bash-completion
+        - man
+        - vim
+        - nano
+        - git
+        - curl
+        - wget
+        - make
+        - unzip
+        - openssh-server
+        - docker.io
+        - build-essential
+      # add user
+      users:
+      - name: default
+      - name: offlinehq
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: users
+        shell: /bin/bash
+      ssh_pwauth: True
+      chpasswd:
+        list: |
+          offlinehq:password
+      locale: en_US.UTF-8
+      timezone: Europe/Ljubljana
+      runcmd:
+      - usermod -a -G docker offlinehq
+      - sudo -H -u offlinehq bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - sudo -H -u offlinehq git clone https://github.com/offlinehacker/dotfiles.git /home/offlinehq/dotfiles
+      - sudo -H -u offlinehq bash /home/offlinehq/dotfiles/install.sh
+  description: ubuntu-dev profile
+  devices:
+    eth0:
+      name: eth0
+      network: incusbr0
+      type: nic
+    root:
+      path: /
+      pool: default
+      type: disk
+  name: ubuntu-dev
+
+projects:
+- config:
+    features.images: "true"
+    features.networks: "true"
+    features.networks.zones: "true"
+    features.profiles: "true"
+    features.storage.buckets: "true"
+    features.storage.volumes: "true"
+  description: Default Incus project
+  name: default
