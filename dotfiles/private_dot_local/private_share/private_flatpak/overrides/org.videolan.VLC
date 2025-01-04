@@ -1,3 +1,4 @@
 [Context]
+sockets=wayland
 devices=dri
 filesystems=xdg-public-share;!host
