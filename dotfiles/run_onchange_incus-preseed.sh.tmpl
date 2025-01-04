@@ -7,6 +7,7 @@ if [ ! -r /run/incus/unix.socket ]; then
 fi
 
 # incus-preseed.yaml hash: {{ includeTemplate "incus-preseed.yaml.tmpl" . | sha256sum }}{{ if stat "/run/incus/unix.socket" }}-exists{{ end }}
+incus stop --all
 incus admin init --preseed <<'EOF'
 {{ includeTemplate "incus-preseed.yaml.tmpl" . }}
 EOF
