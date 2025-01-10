@@ -140,6 +140,7 @@ modules:
         - usbguard.service
         - usbguard-dbus.service
         - incus.socket
+        - powertop.service
 
   # - type: akmods
   #   base: main
