@@ -153,6 +153,11 @@ modules:
       - install-tuxedo.just
       - dotfiles.just
 
+  - type: script
+    snippets:
+      # append extra groups
+      - "grep -E '^tss:' /usr/lib/group >> /etc/group"
+
   - type: chezmoi
     repository: https://github.com/xtruder/fedora-workstation
     branch: main
