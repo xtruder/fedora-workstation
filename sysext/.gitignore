@@ -1,0 +1,4 @@
+*.raw
+rootfs
+image.tar
+.token
