@@ -1,0 +1,18 @@
+FROM fedora:40 as install
+
+ARG TOKEN
+
+RUN dnf install -y curl
+RUN curl --tlsv1.2 --silent --show-error --header "x-connect-key: ${TOKEN}" https://kickstart.jumpcloud.com/Kickstart | sudo bash
+
+FROM scratch as prepare
+
+COPY --from=install /opt/jc /opt/jc
+COPY --from=install /opt/jc_user_ro /opt/jc_user_ro
+COPY --from=install /lib/systemd/system/jcagent.service /usr/lib/systemd/system/jcagent.service
+COPY --from=install /lib/systemd/user/jumpcloud-user-agent.service /usr/lib/systemd/user/jumpcloud-user-agent.service
+COPY --from=install /opt/jc/lib/pam_* /usr/lib64/security/
+COPY extension-release.jcagent /usr/lib/extension-release.d/extension-release.jcagent
+
+FROM scratch
+COPY --from=prepare / /
