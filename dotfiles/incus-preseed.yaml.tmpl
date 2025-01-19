@@ -1,4 +1,4 @@
-{{- $fstype := output "df" "--output=fstype" "-h" "/var/lib/incus/storage-pools/default" | trim | splitList "\n" | last -}}
+{{- $fstype := output "df" "--output=fstype" "-h" "/var/lib/incus" | trim | splitList "\n" | last -}}
 {{- $username := .chezmoi.username -}}
 
 config: {}
