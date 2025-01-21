@@ -158,6 +158,8 @@ modules:
     snippets:
       # append extra groups
       - "grep -E '^tss:' /usr/lib/group >> /etc/group"
+      # fix permissions
+      - "chmod 0600 /etc/usbguard/IPCAccessControl.d/offlinehq"
 
   - type: chezmoi
     repository: https://github.com/xtruder/fedora-workstation
