@@ -140,6 +140,7 @@ modules:
         - usbguard.service
         - usbguard-dbus.service
         - incus.socket
+        - incus.service
         - powertop.service
         - tailscaled.service
 
