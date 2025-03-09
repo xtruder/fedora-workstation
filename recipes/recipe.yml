@@ -67,7 +67,6 @@ modules:
       - sirikali
     # networking
       - tailscale
-      - nordvpn-3.18.5
     # virt / containers
       - incus
       - edk2-ovmf
