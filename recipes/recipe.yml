@@ -19,12 +19,12 @@ modules:
 
   - type: rpm-ostree
     repos:
-      - tuxedo.repo
       - microsoft-vscode.repo
       - ganto-lxc4-incus.repo
       - tuxedo.repo
       - tuxedo-drivers-kmod.repo
       - pgdev-ghostty-fedora-41.repo
+      - nordvpn.repo
     install:
     # system
       - htop
@@ -67,6 +67,7 @@ modules:
       - sirikali
     # networking
       - tailscale
+      - nordvpn-3.18.5
     # virt / containers
       - incus
       - edk2-ovmf
