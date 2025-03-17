@@ -1,4 +1,4 @@
-{{- $fstype := output "df" "--output=fstype" "-h" "/var/lib/incus" | trim | splitList "\n" | last -}}
+{{- $fstype := .fs_type -}}
 {{- $username := .chezmoi.username -}}
 
 config: {}
@@ -66,10 +66,10 @@ profiles:
       locale: en_US.UTF-8
       timezone: Europe/Ljubljana
       runcmd:
-      - usermod -a -G docker {{ $username }}
       - sudo -H -u {{ $username }} bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       - sudo -H -u {{ $username }} git clone https://github.com/offlinehacker/dotfiles.git /home/{{ $username }}/dotfiles
       - sudo -H -u {{ $username }} bash /home/{{ $username }}/dotfiles/install.sh
+      - usermod -a -G docker {{ $username }}
   description: ubuntu-dev profile
   devices:
     eth0:
