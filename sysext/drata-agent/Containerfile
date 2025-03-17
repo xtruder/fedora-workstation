@@ -1,0 +1,17 @@
+FROM docker.io/library/ubuntu:24.04 as install
+
+ADD Drata-agent-linux.deb /Drata-agent-linux.deb
+RUN apt update
+RUN apt install -y /Drata-agent-linux.deb
+
+FROM scratch as prepare
+
+COPY --from=install ["/opt/Drata Agent", "/opt/Drata Agent"]
+COPY --from=install /usr/bin/drata-agent /usr/bin/drata-agent
+COPY --from=install /usr/share/icons/hicolor/128x128/apps/drata-agent.png /usr/share/icons/hicolor/128x128/apps/drata-agent.png
+COPY --from=install /usr/share/applications/drata-agent.desktop /usr/share/applications/drata-agent.desktop
+COPY extension-release.drata-agent /usr/lib/extension-release.d/extension-release.drata-agent
+
+FROM scratch
+COPY --from=prepare / /
+

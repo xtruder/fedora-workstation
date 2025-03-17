@@ -1,4 +1,5 @@
 *.raw
+*.deb
 rootfs
 image.tar
 .token
