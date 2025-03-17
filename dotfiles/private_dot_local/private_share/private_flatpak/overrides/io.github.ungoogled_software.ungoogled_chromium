@@ -1,5 +1,2 @@
 [Context]
 sockets=fallback-x11;!x11
-
-[Environment]
-ELECTRON_OZONE_PLATFORM_HINT=auto
