@@ -7,7 +7,7 @@ description: This is my personal OS image.
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 41 # latest is also supported if you want new updates ASAP
+image-version: 42 # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
@@ -78,7 +78,7 @@ modules:
       - containernetworking-plugins
       - waydroid
 
-      # libvirt stuff
+    # libvirt stuff
       - libvirt-daemon-config-network
       - libvirt-daemon-kvm
       - virt-install
@@ -109,6 +109,8 @@ modules:
       - aircrack-ng
       - nmap
       - wireshark-cli
+    # hw
+      - ryzenadj
 
     remove:
       # example: removing firefox (in favor of the flatpak)
