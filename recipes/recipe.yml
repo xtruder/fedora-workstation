@@ -21,8 +21,8 @@ modules:
     repos:
       - microsoft-vscode.repo
       - ganto-lxc4-incus.repo
-      - tuxedo.repo
-      - tuxedo-drivers-kmod.repo
+      # - tuxedo.repo
+      # - tuxedo-drivers-kmod.repo
       - pgdev-ghostty-fedora-41.repo
       - nordvpn.repo
     install:
@@ -154,7 +154,7 @@ modules:
     validate: true
     include:
       - akmod-keys.just
-      - install-tuxedo.just
+      #- install-tuxedo.just
       - dotfiles.just
 
   - type: script
