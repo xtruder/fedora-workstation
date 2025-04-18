@@ -6,7 +6,7 @@ set -euxo pipefail
 extensions=(
     # System monitor, this is a fork of gnome-shell-extension-system-monitor
     "system-monitor-next@paradoxxx.zero.gmail.com"
-    "appindicatorsupport@rgcjonas.gmail.com"
+    #"appindicatorsupport@rgcjonas.gmail.com"
 
     # Most awesome workspace switcher
     "space-bar@luchrioh"
