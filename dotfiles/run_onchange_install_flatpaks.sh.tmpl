@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+# Function to install a flatpak from GitHub releases
+install_github_flatpak() {
+  local owner="$1"
+  local repo="$2"
+  local flatpak_id="$3"
+
+  echo "Installing $repo ($flatpak_id) from GitHub releases..."
+  
+  # Download the latest release
+  download_url=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | select(.name | contains("flatpak")) | .browser_download_url')
+  if [ -n "$download_url" ]; then
+    local filename=~/Downloads/$(basename "$download_url")
+    echo "Downloading from: $download_url"
+    curl -L "$download_url" -o "$filename" --create-dirs
+    flatpak uninstall --user --assumeyes "$flatpak_id" || true
+    echo "Installing $flatpak_id from $filename"
+    flatpak install --user --noninteractive --assumeyes "$filename"
+  else
+    echo "Failed to find download URL for $owner/$repo"
+  fi
+}
+
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 # default flatpak packages
@@ -35,6 +57,7 @@ gaming=(
     com.parsecgaming.parsec
     com.valvesoftware.Steam
     com.valvesoftware.Steam.CompatibilityTool.Proton-GE
+    net.davidotek.pupgui2
 )
 
 multimedia=(
@@ -64,6 +87,5 @@ flatpaks+=("${gaming[@]}")
 flatpak install --user --noninteractive --assumeyes flathub "${flatpaks[@]}"
 
 {{- if .multimedia }}
-curl -L -o /tmp/fladder.flatpak https://github.com/DonutWare/Fladder/releases/download/v0.6.2/Fladder-Linux-0.6.2.flatpak
-flatpak install --user --noninteractive --assumeyes /tmp/fladder.flatpak
+install_github_flatpak "DonutWare" "Fladder" "nl.jknaapen.fladder"
 {{- end }}
