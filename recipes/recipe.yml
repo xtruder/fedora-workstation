@@ -25,6 +25,7 @@ modules:
       # - tuxedo-drivers-kmod.repo
       - pgdev-ghostty-fedora-41.repo
       - nordvpn.repo
+      - bazzite.repo
     install:
     # system
       - htop
