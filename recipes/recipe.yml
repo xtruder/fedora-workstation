@@ -60,6 +60,7 @@ modules:
       - gnome-tweak-tool
       - ulauncher
       - gnome-shell-extension-pop-shell
+      - gnome-shell-extension-appindicator
       - simple-scan
       - ghostty
     # fs
