@@ -41,7 +41,6 @@ multimedia=(
     io.mpv.Mpv
     org.gimp.GIMP
     com.github.iwalton3.jellyfin-media-player
-    nl.jknaapen.fladder
 )
 
 flatpaks=("${default[@]}")
@@ -63,3 +62,8 @@ flatpaks+=("${gaming[@]}")
 {{- end }}
 
 flatpak install --user --noninteractive --assumeyes flathub "${flatpaks[@]}"
+
+{{- if .multimedia }}
+curl -L -o /tmp/fladder.flatpak https://github.com/DonutWare/Fladder/releases/download/v0.6.2/Fladder-Linux-0.6.2.flatpak
+flatpak install --user --noninteractive --assumeyes /tmp/fladder.flatpak
+{{- end }}
