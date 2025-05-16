@@ -1,0 +1,30 @@
+[Unit]
+Description=Reset Microsoft TPM after resume from hibernation
+After=hibernate.target
+ConditionPathExists=/sys/bus/acpi/devices/MSFT0101:00
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c '\
+  # Reset the TPM driver \
+  echo "MSFT0101:00" > /sys/bus/acpi/drivers/tpm_crb/unbind; \
+  echo "MSFT0101:00" > /sys/bus/acpi/drivers/tpm_crb/bind; \
+  \
+  # Wait for device to be available \
+  sleep 1; \
+  \
+  # Find the first TPM device and create symlinks \
+  FIRST_TPM=$(ls /dev/tpm* | grep -v "rm" | sort | head -n 1); \
+  FIRST_TPMRM=$(ls /dev/tpmrm* | sort | head -n 1); \
+  \
+  if [ -n "$FIRST_TPM" ] && [ "$FIRST_TPM" != "/dev/tpm0" ]; then \
+    ln -sf $FIRST_TPM /dev/tpm0; \
+  fi; \
+  \
+  if [ -n "$FIRST_TPMRM" ] && [ "$FIRST_TPMRM" != "/dev/tpmrm0" ]; then \
+    ln -sf $FIRST_TPMRM /dev/tpmrm0; \
+  fi; \
+'
+
+[Install]
+WantedBy=hibernate.target

@@ -147,6 +147,7 @@ modules:
         - incus.service
         - powertop.service
         - tailscaled.service
+        - tpm-hibernate-reset.service
 
   # - type: akmods
   #   base: main
