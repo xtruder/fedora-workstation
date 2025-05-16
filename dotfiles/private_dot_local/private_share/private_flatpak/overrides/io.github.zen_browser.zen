@@ -1,0 +1,7 @@
+[Context]
+sockets=!x11
+devices=dri
+filesystems=~/.zen
+
+[Environment]
+MOZ_ENABLE_WAYLAND=1
