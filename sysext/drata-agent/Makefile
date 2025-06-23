@@ -1,4 +1,4 @@
-VERSION := 3.7.0-1
+VERSION := 3.8.0
 ARCH := x86-64
 
 build:
