@@ -26,6 +26,9 @@ modules:
       - pgdev-ghostty-fedora-41.repo
       - nordvpn.repo
       - bazzite.repo
+      - ublue-os-staging.repo
+      - ublue-os-akmods.repo
+      - windsurf.repo
     install:
     # system
       - htop
@@ -113,6 +116,9 @@ modules:
       - wireshark-cli
     # hw
       - ryzenadj
+    # framework
+      - fw-fanctrl
+      - fw-ectool
 
     remove:
       # example: removing firefox (in favor of the flatpak)
