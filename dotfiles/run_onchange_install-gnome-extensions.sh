@@ -17,6 +17,9 @@ extensions=(
     # For gtk3 based apps like firefox gnome will not automatically switch to dark mode
     # so we need to install this extension to switch to dark mode when firefox is in dark mode
     "legacyschemeautoswitcher@joshimukul29.gmail.com"
+
+    # framework laptop fw-ctrl extension
+    "fw-fanctrl-revived@willow.sh"
 )
 
 for name in "${extensions[@]}"; do
