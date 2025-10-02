@@ -29,6 +29,7 @@ modules:
       - ublue-os-staging.repo
       - ublue-os-akmods.repo
       - windsurf.repo
+      - cursor.repo
     install:
     # system
       - htop

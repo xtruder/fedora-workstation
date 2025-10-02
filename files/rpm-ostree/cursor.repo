@@ -1,0 +1,7 @@
+[cursor]
+name=Cursor IDE Repository
+baseurl=https://rpm-repo-proxy.x-truder.net/cursor
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+type=rpm
