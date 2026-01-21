@@ -1,0 +1,7 @@
+[open-code]
+name=OpenCode Repository
+baseurl=https://rpm-repo-proxy.x-truder.net/open-code
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+type=rpm

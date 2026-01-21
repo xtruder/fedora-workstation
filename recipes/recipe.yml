@@ -29,6 +29,7 @@ modules:
       - ublue-os-akmods.repo
       - windsurf.repo
       - cursor.repo
+      - open-code.repo
     install:
     # system
       - htop
