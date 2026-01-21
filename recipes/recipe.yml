@@ -23,7 +23,7 @@ modules:
       - ganto-lxc4-incus.repo
       # - tuxedo.repo
       # - tuxedo-drivers-kmod.repo
-      - pgdev-ghostty-fedora-41.repo
+      - ghostty.repo
       - nordvpn.repo
       - bazzite.repo
       - ublue-os-staging.repo
