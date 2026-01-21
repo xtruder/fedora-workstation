@@ -1,7 +1,10 @@
 [Context]
-sockets=session-bus;!x11
-devices=undefined;dri
-filesystems=~/.mozilla;xdg-public-share;xdg-pictures;xdg-documents
+sockets=!x11;session-bus;
+devices=dri;
+filesystems=~/.mozilla;xdg-public-share;xdg-pictures;xdg-documents;
+
+[Session Bus Policy]
+org.freedesktop.Flatpak=talk
 
 [Environment]
 MOZ_ENABLE_WAYLAND=1

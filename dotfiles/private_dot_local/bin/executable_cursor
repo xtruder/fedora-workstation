@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-nohup ~/.local/share/libexec/cursor.AppImage "$@" > ~/.cursor_log 2>&1 &

@@ -1,5 +1,5 @@
 [Context]
-filesystems=xdg-download:rw
+filesystems=xdg-download:rw;~/Games/steam:rw
 
 [Environment]
 MANGOHUD=1
