@@ -1,7 +1,6 @@
 [cursor]
-name=Cursor IDE Repository
-baseurl=https://rpm-repo-proxy.x-truder.net/cursor
+name=Cursor
+baseurl=https://downloads.cursor.com/yumrepo
 enabled=1
-gpgcheck=0
-repo_gpgcheck=0
-type=rpm
+gpgcheck=1
+gpgkey=https://downloads.cursor.com/keys/anysphere.asc
