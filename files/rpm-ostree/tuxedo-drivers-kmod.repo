@@ -1,8 +1,10 @@
-[copr:copr.fedorainfracloud.org:offlinehacker:tuxedo-drivers-kmod]
-baseurl = https://download.copr.fedorainfracloud.org/results/offlinehacker/tuxedo-drivers-kmod/fedora-$releasever-$basearch/
-enabled = 1
-gpgcheck = 1
-gpgkey = https://download.copr.fedorainfracloud.org/results/offlinehacker/tuxedo-drivers-kmod/pubkey.gpg
-name = Copr repo for tuxedo-drivers-kmod owned by offlinehacker
-repo_gpgcheck = 0
-skip_if_unavailable = 1
+[copr:copr.fedorainfracloud.org:gladion136:tuxedo-drivers-kmod]
+name=Copr repo for tuxedo-drivers-kmod owned by gladion136
+baseurl=https://download.copr.fedorainfracloud.org/results/gladion136/tuxedo-drivers-kmod/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/gladion136/tuxedo-drivers-kmod/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
