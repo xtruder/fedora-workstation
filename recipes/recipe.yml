@@ -55,6 +55,7 @@ modules:
       - usbguard
       - usbguard-dbus
       - powertop
+      - dbus-tools
     # bench
       - stress-ng
       - s-tui
