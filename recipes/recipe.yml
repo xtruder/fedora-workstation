@@ -179,6 +179,7 @@ modules:
     nofile-limits: true # increase nofile limits
     brew-analytics: false # disable telemetry
     auto-update: true
+    direct-pull: true # bypass GitHub API rate limits
 
   - type: chezmoi
     repository: https://github.com/xtruder/fedora-workstation
