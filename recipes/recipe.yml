@@ -39,7 +39,8 @@ modules:
       - unzip
       - p7zip
       - procps
-      - akmods
+      # akmods is handled by the akmods module below to avoid kernel-devel-matched conflicts
+      # - akmods
       - bcc
       - strace
       - zenity
@@ -157,9 +158,9 @@ modules:
         - tailscaled.service
         - tpm-hibernate-reset.service
 
-  # - type: akmods
-  #   base: main
-  #   install: []
+  - type: akmods
+    base: main
+    install: []
 
   - type: justfiles
     validate: true
