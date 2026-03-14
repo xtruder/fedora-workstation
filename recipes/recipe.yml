@@ -39,8 +39,7 @@ modules:
       - unzip
       - p7zip
       - procps
-      # akmods is handled by the akmods module below to avoid kernel-devel-matched conflicts
-      # - akmods
+      - akmods
       - bcc
       - strace
       - zenity
@@ -158,9 +157,13 @@ modules:
         - tailscaled.service
         - tpm-hibernate-reset.service
 
-  - type: akmods
-    base: main
-    install: []
+  # Note: the akmods module is intentionally disabled. `install: []` (empty array)
+  # causes the module to fail with "You didn't specify any akmod or nvidia driver for
+  # installation!". Only enable this module when you actually need specific kernel modules
+  # (e.g. install: [openrazer, v4l2loopback]). See: https://blue-build.org/reference/modules/akmods/
+  # - type: akmods
+  #   base: main
+  #   install: []
 
   - type: justfiles
     validate: true
