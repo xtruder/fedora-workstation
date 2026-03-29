@@ -70,6 +70,8 @@ profiles:
       - sudo -H -u {{ $username }} git clone https://github.com/offlinehacker/dotfiles.git /home/{{ $username }}/dotfiles
       - sudo -H -u {{ $username }} bash /home/{{ $username }}/dotfiles/install.sh
       - usermod -a -G docker {{ $username }}
+      # Disable udisks2 to prevent blocking host suspend (it polls lxcfs FUSE mounts)
+      - systemctl disable --now udisks2
   description: ubuntu-dev profile
   devices:
     eth0:
