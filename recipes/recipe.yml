@@ -17,6 +17,19 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
+  - type: script
+    snippets:
+      - |
+          set -euo pipefail
+          for d in /usr/lib/modules/*; do
+            [ -d "$d" ] || continue
+            k="${d##*/}"
+            if ! rpm -q "kernel-modules-core-${k}" >/dev/null 2>&1 && ! rpm -q "kernel-core-${k}" >/dev/null 2>&1; then
+              echo "Removing orphaned kernel module tree: $d"
+              rm -rf "$d" "/usr/src/kernels/$k"
+            fi
+          done
+
   - type: rpm-ostree
     repos:
       - microsoft-vscode.repo
@@ -118,10 +131,11 @@ modules:
       - wireshark-cli
     # hw
       - ryzenadj
+      - akmod-tuxedo-drivers
     # framework
       - fw-fanctrl
       - fw-ectool
-
+      
     remove:
       # example: removing firefox (in favor of the flatpak)
       # "firefox" is the main package, "firefox-langpacks" is a dependency
