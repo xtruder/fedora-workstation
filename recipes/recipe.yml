@@ -131,7 +131,7 @@ modules:
       - wireshark-cli
     # hw
       - ryzenadj
-      - akmod-tuxedo-drivers
+      - tuxedo-drivers-kmod
     # framework
       - fw-fanctrl
       - fw-ectool
