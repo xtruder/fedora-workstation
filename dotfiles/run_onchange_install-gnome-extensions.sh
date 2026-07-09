@@ -18,8 +18,8 @@ extensions=(
     # so we need to install this extension to switch to dark mode when firefox is in dark mode
     "legacyschemeautoswitcher@joshimukul29.gmail.com"
 
-    # framework laptop fw-ctrl extension
-    "fw-fanctrl-revived@willow.sh"
+    # To control battery charging limits
+    "Battery-Health-Charging@maniacx.github.com"
 )
 
 for name in "${extensions[@]}"; do
