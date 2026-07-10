@@ -23,10 +23,18 @@ hardware utilities (fw-fanctrl, fw-ectool), and developer tools.
   - [Switching to signed images](#switching-to-signed-images)
 - [Dotfiles](#dotfiles)
 - [Post-install setup](#post-install-setup)
+  - [Firmware updates](#firmware-updates)
+  - [Power management](#power-management)
+  - [Firmware / TPM](#firmware--tpm)
+  - [Fingerprint reader](#fingerprint-reader)
+  - [USB device authorization](#usb-device-authorization)
+  - [Thunderbolt](#thunderbolt)
+  - [SSH server](#ssh-server)
+  - [GPG keys](#gpg-keys)
+  - [Incus](#incus)
   - [1Password](#1password)
   - [Nextcloud sync](#nextcloud-sync)
   - [Firefox](#firefox)
-  - [Incus dev container](#incus-dev-container)
 - [Included `ujust` commands](#included-ujust-commands)
 - [CI](#ci)
 - [Notes](#notes)
@@ -80,7 +88,7 @@ The `rpm-ostree` module installs (grouped by purpose):
 - **AMD ROCm**: `rocminfo`, `rocm-smi`
 - **Android / USB**: `android-tools`, `libusb1-devel`, `libudev-devel`
 - **Bench**: `stress-ng`, `s-tui`
-- **Editors**: `code` (VSCode)
+- **Editors**: `code` (VSCode / VSCodium); settings sync via `zokugun.sync-settings`
 - **Filesystem / encryption**: `fscrypt`, `davfs2`, `sirikali`
 
 Removed: `firefox`, `firefox-langpacks` (replaced by the Flatpak).
@@ -115,6 +123,7 @@ Notable files baked into the image:
 - `etc/systemd/system/tpm-hibernate-reset.service` — resets TPM counters
   on hibernate
 - `etc/sysctl.d/99-rootles-net.conf` — rootless container sysctls
+- `etc/sysctl.d/99-ptrace-scope.conf` — sets `kernel.yama.ptrace_scope=1` (needed by 1Password)
 - `etc/sysusers.d/99-users-groups.conf` — static user/group declarations
 - `etc/udev/rules.d/hp_lt4110.rules` — HP LT4110 modem udev rule
 - `etc/1password/custom_allowed_browsers` — browsers allowed to integrate
@@ -207,54 +216,146 @@ inputs change:
 
 ## Post-install setup
 
-### 1Password
+### Firmware updates
 
-The `bling` module installs 1Password. Sign in, then ensure your browser
-is listed in `/etc/1password/custom_allowed_browsers` so the browser
-extension can talk to the desktop app.
+```sh
+fwupdmgr refresh
+fwupdmgr update
+```
 
-### Nextcloud sync
+### Power management
 
-Configure your Nextcloud account in the GNOME Online Accounts settings,
-or mount it via WebDAV using `davfs2` (installed by the image).
+#### Suspend debugging
 
-### Firefox
+Check available suspend states and debug S0ix residency:
 
-The rpm Firefox is removed in favor of the Flatpak. Most settings sync
-once you sign into a Firefox account, but the manual steps are:
+```sh
+cat /sys/power/mem_sleep
+sudo powertop
+```
 
-- Create Firefox profiles (e.g. Personal / Work)
-- Sign in with Firefox Sync
-- Configure basics:
-  - Reopen windows/tabs on restart
-  - Set desktop theme to auto-switch
-  - Enable HTTPS-only mode
-  - Enable hardware-accelerated playback with
-    `media.ffmpeg.vaapi.enabled` (also sync via
-    `services.sync.prefs.sync-seen.media.ffmpeg.vaapi.enabled`)
-- Install extensions:
-  - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
-  - Dark Reader (enable auto-switch)
-  - uBlock Origin
-  - 1Password
-  - Window Titler
-  - ClearURLs
-  - Link to Text Fragment
-- Create Work / Personal containers
-- Sign in to sites in the appropriate profile/container: mail, YouTube,
-  YouTube Music
+For deeper S0ix analysis on Intel hardware:
 
-### Incus dev container
+```sh
+git clone https://github.com/intel/S0ixSelftestTool.git
+cd S0ixSelftestTool
+sudo ./s0ix-selftest-tool.sh -s
+```
 
-Add yourself to the `incus-admin` group and refresh your session:
+### Firmware / TPM
+
+```sh
+# TPM2 tools (explore capabilities)
+sudo tpm2_getcap -l
+
+# Add yourself to the tss group for TPM access
+sudo usermod -a -G tss "$USER"
+newgrp tss
+```
+
+### Fingerprint reader
+
+Fingerprints are enrolled via GNOME Settings. To remove an enrolled
+fingerprint from the CLI:
+
+```sh
+sudo fprintd-delete "$USER"
+```
+
+### USB device authorization
+
+After first boot, `usbguard` will block peripherals. List and
+permanently authorize your keyboard, mouse, and other trusted devices:
+
+```sh
+usbguard list-devices
+usbguard allow-device --permanent <id>
+```
+
+### Thunderbolt
+
+#### Bolt service
+
+```sh
+sudo systemctl start bolt
+sudo boltctl list
+sudo boltctl domains
+```
+
+#### Auto-authorization (IOMMU-protected)
+
+On machines with IOMMU DMA protection, Thunderbolt devices can be
+safely auto-authorized. Create a udev rule:
+
+```sh
+sudo tee /etc/udev/rules.d/99-thunderbolt-auto-authorize.rules <<'EOF'
+# Auto-authorize when IOMMU DMA protection is active (safe)
+ACTION=="add", SUBSYSTEM=="thunderbolt", ATTRS{iommu_dma_protection}=="1", ATTR{authorized}=="0", ATTR{authorized}="1"
+EOF
+sudo udevadm control --reload-rules
+```
+
+Optionally load the Thunderbolt networking module:
+
+```sh
+sudo modprobe thunderbolt-net
+```
+
+### SSH server
+
+```sh
+sudo systemctl start sshd
+sudo firewall-cmd --add-port=22/tcp --zone=FedoraWorkstation
+```
+
+Set up your authorized keys:
+
+```sh
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+vi ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+```
+
+### GPG keys
+
+Search for and import a public key from keyservers:
+
+```sh
+gpg2 --search-keys <email>
+```
+
+Import a secret key file, transfer it to TPM, and trust it:
+
+```sh
+gpg2 --import <key-file>
+gpg2 --edit-key <key-id>
+# At the gpg> prompt, run: keytotpm -> trust -> 5 -> quit
+```
+
+To use a GPG key for SSH authentication, add its keygrip to
+`~/.gnupg/sshcontrol`:
+
+```sh
+gpg2 --with-keygrip -K <key-id>
+# Copy the keygrip line and add it to:
+echo <keygrip> >> ~/.gnupg/sshcontrol
+```
+
+### Incus
+
+#### Group membership
+
+Add yourself to both the `incus` and `incus-admin` groups and refresh
+your session:
 
 ```sh
 grep -E '^incus-admin:' /usr/etc/group | sudo tee -a /etc/group
 sudo usermod -a -G incus-admin "$USER"
+sudo usermod -a -G incus "$USER"
 newgrp incus-admin
 ```
 
-Set up subuid/subgid mappings:
+#### Subuid/subgid mappings
 
 ```sh
 sudo usermod --add-subuids 524288-65536 "$USER"
@@ -262,6 +363,25 @@ sudo usermod --add-subuids 1000000-1000000000 root
 sudo usermod --add-subgids 524288-65536 "$USER"
 sudo usermod --add-subgids 1000000-1000000000 root
 ```
+
+#### HTTPS API (remote access)
+
+Expose the Incus API on the LAN for use from other machines (e.g. a
+Framework laptop acting as a server):
+
+```sh
+sudo incus config set local: core.https_address=:8443
+sudo firewall-cmd --add-port=8443/tcp --zone=FedoraWorkstation
+```
+
+On the remote machine, add the trust token:
+
+```sh
+incus config trust add framework
+# paste the token generated by `incus config trust list` on the server
+```
+
+#### Dev container
 
 Create and start a dev container:
 
@@ -303,6 +423,43 @@ Connect:
 incus exec ubuntu-dev -- bash   # or
 ssh ubuntu-dev
 ```
+
+### 1Password
+
+The `bling` module installs 1Password. Sign in, then ensure your browser
+is listed in `/etc/1password/custom_allowed_browsers` so the browser
+extension can talk to the desktop app.
+
+### Nextcloud sync
+
+Configure your Nextcloud account in the GNOME Online Accounts settings,
+or mount it via WebDAV using `davfs2` (installed by the image).
+
+### Firefox
+
+The rpm Firefox is removed in favor of the Flatpak. Most settings sync
+once you sign into a Firefox account, but the manual steps are:
+
+- Create Firefox profiles (e.g. Personal / Work)
+- Sign in with Firefox Sync
+- Configure basics:
+  - Reopen windows/tabs on restart
+  - Set desktop theme to auto-switch
+  - Enable HTTPS-only mode
+  - Enable hardware-accelerated playback with
+    `media.ffmpeg.vaapi.enabled` (also sync via
+    `services.sync.prefs.sync-seen.media.ffmpeg.vaapi.enabled`)
+- Install extensions:
+  - [multi-account-containers](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
+  - Dark Reader (enable auto-switch)
+  - uBlock Origin
+  - 1Password
+  - Window Titler
+  - ClearURLs
+  - Link to Text Fragment
+- Create Work / Personal containers
+- Sign in to sites in the appropriate profile/container: mail, YouTube,
+  YouTube Music
 
 ## Included `ujust` commands
 
