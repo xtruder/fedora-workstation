@@ -210,6 +210,7 @@ inputs change:
 - `run_onchange_install-gnome-extensions.sh` — installs GNOME Shell
   extensions
 - `run_onchange_install-ngrok.sh` — installs ngrok
+- `run_onchange_install-opencode-appimage.sh.tmpl` — installs and updates the OpenCode AppImage
 - `run_onchange_install-trezor-suite.sh.tmpl` — installs Trezor Suite
 - `run_onchange_incus-preseed.sh.tmpl` — applies an Incus preseed
   (`incus-preseed.yaml.tmpl`)

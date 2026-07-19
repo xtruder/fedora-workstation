@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+name={{ .name | quote }}
+repository={{ .repository | quote }}
+asset={{ .asset | quote }}
+destination="$HOME/.local/share/libexec/{{ .filename }}"
+desktop_filename={{ .desktopFilename | quote }}
+desktop_exec={{ .desktopExec | quote }}
+signature_key_url={{ .signatureKeyUrl | quote }}
+version_file="${destination}.version"
+
+# Check for a new release once per day: {{ now | date "2006-01-02" }}
+latest_url="https://github.com/${repository}/releases/latest"
+if ! release_url=$(curl --fail --silent --show-error --head --max-redirs 0 \
+    --retry 5 --retry-all-errors --retry-delay 2 \
+    --output /dev/null --write-out '%{redirect_url}' "$latest_url"); then
+    if [[ -x "$destination" && -f "$version_file" ]]; then
+        echo "Could not check for a new ${name} release; keeping $(< "$version_file")" >&2
+        exit 0
+    fi
+    exit 1
+fi
+release_path=${release_url#*/releases/tag/}
+version=${release_path%%[/?#]*}
+if [[ -z "$release_url" || "$release_path" == "$release_url" || -z "$version" ]]; then
+    echo "Could not resolve the latest ${name} release" >&2
+    exit 1
+fi
+asset=${asset//\{version\}/${version#v}}
+url="https://github.com/${repository}/releases/download/${version}/${asset}"
+
+if [[ -x "$destination" && -f "$version_file" && "$(< "$version_file")" == "$version" ]]; then
+    echo "${name} ${version} is already installed"
+    exit 0
+fi
+
+mkdir -p "$(dirname "$destination")"
+temporary=$(mktemp "${destination}.tmp.XXXXXX")
+extraction=""
+desktop_temporary=""
+version_temporary=""
+signature_temporary=""
+key_temporary=""
+trap 'rm -f "$temporary"; [[ -z "$desktop_temporary" ]] || rm -f "$desktop_temporary"; [[ -z "$version_temporary" ]] || rm -f "$version_temporary"; [[ -z "$signature_temporary" ]] || rm -f "$signature_temporary"; [[ -z "$key_temporary" ]] || rm -f "$key_temporary"; [[ -z "$extraction" ]] || rm -rf "$extraction"' EXIT
+
+echo "Installing ${name} ${version} to ${destination}"
+curl --fail --location --progress-bar --output "$temporary" "$url"
+if [[ -n "$signature_key_url" ]]; then
+    signature_temporary=$(mktemp)
+    key_temporary=$(mktemp)
+    gpg_command=$(command -v gpg2 || command -v gpg)
+    curl --fail --location --silent --show-error --output "$signature_temporary" "${url}.asc"
+    curl --fail --location --silent --show-error --output "$key_temporary" "$signature_key_url"
+    "$gpg_command" --import "$key_temporary"
+    "$gpg_command" --verify "$signature_temporary" "$temporary"
+fi
+chmod 0755 "$temporary"
+mv --force "$temporary" "$destination"
+
+extraction=$(mktemp --directory)
+(
+    cd "$extraction"
+    "$destination" --appimage-extract > /dev/null
+)
+
+appdir="$extraction/squashfs-root"
+shopt -s nullglob
+desktop_files=("$appdir"/*.desktop)
+desktop_source=""
+for candidate in "${desktop_files[@]}"; do
+    if grep --quiet --binary-files=without-match '^\[Desktop Entry\]$' "$candidate"; then
+        desktop_source=$candidate
+        break
+    fi
+done
+if [[ -z "$desktop_source" ]]; then
+    echo "No desktop entry found in ${name} AppImage" >&2
+    exit 1
+fi
+
+applications_dir="$HOME/.local/share/applications"
+mkdir -p "$applications_dir"
+desktop_temporary=$(mktemp "${applications_dir}/${desktop_filename}.tmp.XXXXXX")
+icon_name=""
+section=""
+while IFS= read -r line; do
+    if [[ "$line" == \[*\] ]]; then
+        section=$line
+    fi
+    if [[ "$section" == "[Desktop Entry]" && "$line" == Exec=* ]]; then
+        printf 'Exec=%s\n' "$desktop_exec"
+    else
+        printf '%s\n' "$line"
+    fi
+    if [[ "$section" == "[Desktop Entry]" && "$line" == Icon=* ]]; then
+        icon_name=${line#Icon=}
+    fi
+done < "$desktop_source" > "$desktop_temporary"
+chmod 0644 "$desktop_temporary"
+mv --force "$desktop_temporary" "$applications_dir/$desktop_filename"
+
+if [[ -d "$appdir/usr/share/icons" ]]; then
+    mkdir -p "$HOME/.local/share/icons"
+    cp --archive "$appdir/usr/share/icons/." "$HOME/.local/share/icons/"
+fi
+
+for icon_file in "$appdir/$icon_name.png" "$appdir/$icon_name.svg" "$appdir/$icon_name.xpm"; do
+    [[ -f "$icon_file" ]] || continue
+    if [[ "$icon_file" == *.svg ]]; then
+        icon_dir="$HOME/.local/share/icons/hicolor/scalable/apps"
+    else
+        icon_dir="$HOME/.local/share/icons/hicolor/512x512/apps"
+    fi
+    mkdir -p "$icon_dir"
+    cp --dereference "$icon_file" "$icon_dir/"
+    break
+done
+
+version_temporary=$(mktemp "${version_file}.tmp.XXXXXX")
+printf '%s\n' "$version" > "$version_temporary"
+chmod 0644 "$version_temporary"
+mv --force "$version_temporary" "$version_file"
