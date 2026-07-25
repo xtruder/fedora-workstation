@@ -1,11 +1,10 @@
-{{- $repository := "trezor/trezor-suite" -}}
-{{- $asset := "Trezor-Suite-{version}-linux-x86_64.AppImage" -}}
+{{- $releaseApiUrl := "https://api.github.com/repos/trezor/trezor-suite/releases/latest" -}}
+{{- $asset := "Trezor-Suite-{versionNoV}-linux-x86_64.AppImage" -}}
 {{ includeTemplate "install-appimage" (dict
     "name" "Trezor Suite"
-    "repository" $repository
+    "releaseApiUrl" $releaseApiUrl
     "asset" $asset
     "filename" "trezor-suite.AppImage"
     "desktopFilename" "trezor-suite.desktop"
-    "desktopExec" "trezor-suite %U"
     "signatureKeyUrl" "https://trezor.io/security/satoshilabs-2021-signing-key.asc"
 ) }}

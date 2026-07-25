@@ -1,0 +1,16 @@
+{{- if .gaming }}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+for path in \
+    "$HOME/.config/Ryujinx" \
+    "$HOME/.config/suyu" \
+    "$HOME/.local/bin/ryujinx" \
+    "$HOME/.local/bin/suyu" \
+    "$HOME/.local/share/suyu"; do
+    if [[ -L "$path" ]]; then
+        rm "$path"
+    fi
+done
+{{- end }}

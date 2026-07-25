@@ -1,11 +1,10 @@
-{{- $repository := "anomalyco/opencode" -}}
+{{- $releaseApiUrl := "https://api.github.com/repos/anomalyco/opencode/releases/latest" -}}
 {{- $asset := "opencode-desktop-linux-x86_64.AppImage" -}}
 {{ includeTemplate "install-appimage" (dict
     "name" "OpenCode"
-    "repository" $repository
+    "releaseApiUrl" $releaseApiUrl
     "asset" $asset
     "filename" "opencode-desktop.AppImage"
     "desktopFilename" "opencode.desktop"
-    "desktopExec" "opencode-desktop %U"
     "signatureKeyUrl" ""
 ) }}
