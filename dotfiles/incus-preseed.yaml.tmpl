@@ -59,10 +59,15 @@ profiles:
         sudo: ALL=(ALL) NOPASSWD:ALL
         groups: users
         shell: /bin/bash
-      ssh_pwauth: True
       chpasswd:
+        expire: false
         list: |
           {{ $username }}:password
+      write_files:
+        - path: /etc/ssh/sshd_config.d/99-custom.conf
+          content: |
+            PasswordAuthentication yes
+            StreamLocalBindUnlink yes
       locale: en_US.UTF-8
       timezone: Europe/Ljubljana
       runcmd:

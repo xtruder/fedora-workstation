@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync GTK legacy theme with GNOME color-scheme
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/gnome-theme-monitor.sh
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
