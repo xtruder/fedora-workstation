@@ -1,0 +1,10 @@
+{{- $releaseApiUrl := "https://api.github.com/repos/openchamber/openchamber/releases/tags/v1.18.1" -}}
+{{- $asset := "OpenChamber-{versionNoV}-linux-x86_64.AppImage" -}}
+{{ includeTemplate "install-appimage" (dict
+    "name" "OpenChamber"
+    "releaseApiUrl" $releaseApiUrl
+    "asset" $asset
+    "filename" "openchamber.AppImage"
+    "desktopFilename" "openchamber.desktop"
+    "signatureKeyUrl" ""
+) }}
