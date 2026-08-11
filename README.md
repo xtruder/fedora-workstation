@@ -211,6 +211,7 @@ inputs change:
   extensions
 - `run_onchange_install-ngrok.sh` — installs ngrok
 - `run_onchange_install-opencode-appimage.sh.tmpl` — installs and updates the OpenCode AppImage
+- `run_onchange_install-openchamber-appimage.sh.tmpl` — installs OpenChamber v1.18.1 from its AppImage
 - `run_onchange_install-eden-appimage.sh.tmpl` — installs and updates Eden on gaming systems
 - `run_onchange_install-trezor-suite.sh.tmpl` — installs Trezor Suite
 - `run_onchange_incus-preseed.sh.tmpl` — applies an Incus preseed
