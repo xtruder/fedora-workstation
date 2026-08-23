@@ -1,6 +1,11 @@
 variant: fcos
 version: 1.6.0
 
+kernel_arguments:
+  should_exist:
+    - console=ttyS0,115200n8
+    - console=tty0
+
 passwd:
   users:
     - name: offlinehq
@@ -11,9 +16,42 @@ passwd:
         - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBn3XS9FgqskCni3d8LIw20+vUutFK6F8P2wcjZVMbDJLtzQO194hXjQoveEN7RZ8EdiJBjme3r3XdwwoMcNQUgMSpGiFtD2oG3zoApFJf6y7T5P25PdZyK+Tlb2YySCLQ== (none)
 
 storage:
+  disks:
+    - device: /dev/sda
+      wipe_table: false
+      partitions:
+        - label: boot
+          number: 3
+          start_mib: 129
+          size_mib: 2048
+          type_guid: bc13c2ff-59e6-4262-a352-b275fd6f7172
+          wipe_partition_entry: true
+        - label: root
+          number: 4
+          start_mib: 2177
+          size_mib: 0
+          type_guid: 4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+          wipe_partition_entry: true
+
+  filesystems:
+    - device: /dev/disk/by-partlabel/boot
+      format: ext4
+      label: boot
+      wipe_filesystem: true
+    - device: /dev/disk/by-partlabel/root
+      format: xfs
+      label: root
+      wipe_filesystem: true
+
   directories:
     - path: /etc/fedora-workstation-autorebase
       mode: 0755
+    - path: /home/offlinehq/.config
+      mode: 0700
+      user:
+        name: offlinehq
+      group:
+        name: offlinehq
     - path: /home/offlinehq/.config/chezmoi
       mode: 0700
       user:
@@ -22,6 +60,14 @@ storage:
         name: offlinehq
 
   files:
+    - path: /etc/fstab
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          LABEL=boot /boot ext4 defaults 0 2
+          LABEL=EFI-SYSTEM /boot/efi vfat umask=0077,shortname=winnt 0 2
+
     - path: /etc/hostname
       overwrite: true
       mode: 0644
@@ -49,7 +95,8 @@ storage:
           [data]
             name = "Jaka Hudoklin"
             email = "jaka@x-truder.net"
-            fs_type = "btrfs"
+            fs_type = "xfs"
+            incus = false
             work = false
             crypto = false
             gaming = false
@@ -79,6 +126,12 @@ storage:
           set -euo pipefail
 
           uid=$(id -u offlinehq)
+          install -d -o offlinehq -g offlinehq \
+            /home/offlinehq/.config/systemd \
+            /home/offlinehq/.config/systemd/user \
+            /home/offlinehq/.config/systemd/user/default.target.wants \
+            /home/offlinehq/.config/systemd/user/timers.target.wants
+
           graphical_session_running() {
             local id session_uid user rest
             while read -r id session_uid user rest; do
@@ -232,6 +285,7 @@ systemd:
         Type=oneshot
         StandardOutput=journal+console
         ExecCondition=/bin/bash -c 'test "$(cat /etc/fedora-workstation-autorebase/unverified)" != "$(cat /proc/sys/kernel/random/boot_id)"'
+        ExecCondition=/bin/bash -c 'rpm-ostree status --booted | grep -Fq "ostree-unverified-registry:ghcr.io/xtruder/fedora-workstation:latest"'
         ExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest
         ExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id > /etc/fedora-workstation-autorebase/signed'
         ExecStart=/usr/bin/systemctl disable fedora-workstation-signed-autorebase.service
@@ -253,6 +307,7 @@ systemd:
         [Service]
         Type=oneshot
         ExecCondition=/bin/bash -c 'test "$(cat /etc/fedora-workstation-autorebase/signed)" != "$(cat /proc/sys/kernel/random/boot_id)"'
+        ExecCondition=/bin/bash -c 'rpm-ostree status --booted | grep -Fq "ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest"'
         ExecStart=/usr/bin/loginctl enable-linger offlinehq
         ExecStart=/usr/bin/systemctl set-default graphical.target
         ExecStart=/usr/bin/systemctl enable --now sshd.service

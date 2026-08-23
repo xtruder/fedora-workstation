@@ -2,6 +2,12 @@
   "ignition": {
     "version": "3.5.0"
   },
+  "kernelArguments": {
+    "shouldExist": [
+      "console=ttyS0,115200n8",
+      "console=tty0"
+    ]
+  },
   "passwd": {
     "users": [
       {
@@ -26,6 +32,16 @@
         "group": {
           "name": "offlinehq"
         },
+        "path": "/home/offlinehq/.config",
+        "user": {
+          "name": "offlinehq"
+        },
+        "mode": 448
+      },
+      {
+        "group": {
+          "name": "offlinehq"
+        },
         "path": "/home/offlinehq/.config/chezmoi",
         "user": {
           "name": "offlinehq"
@@ -33,7 +49,40 @@
         "mode": 448
       }
     ],
+    "disks": [
+      {
+        "device": "/dev/sda",
+        "partitions": [
+          {
+            "label": "boot",
+            "number": 3,
+            "sizeMiB": 2048,
+            "startMiB": 129,
+            "typeGuid": "bc13c2ff-59e6-4262-a352-b275fd6f7172",
+            "wipePartitionEntry": true
+          },
+          {
+            "label": "root",
+            "number": 4,
+            "sizeMiB": 0,
+            "startMiB": 2177,
+            "typeGuid": "4f68bce3-e8cd-4db1-96e7-fbcaf984b709",
+            "wipePartitionEntry": true
+          }
+        ],
+        "wipeTable": false
+      }
+    ],
     "files": [
+      {
+        "overwrite": true,
+        "path": "/etc/fstab",
+        "contents": {
+          "compression": "",
+          "source": "data:,LABEL%3Dboot%20%2Fboot%20ext4%20defaults%200%202%0ALABEL%3DEFI-SYSTEM%20%2Fboot%2Fefi%20vfat%20umask%3D0077%2Cshortname%3Dwinnt%200%202%0A"
+        },
+        "mode": 420
+      },
       {
         "overwrite": true,
         "path": "/etc/hostname",
@@ -63,7 +112,7 @@
         },
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/0zLQarCMBCH8X1PMXT/3g0KLsUriMhfM6kxmaRMJmhvL3Eh2f4+vrOD4TIRZQjTQvMJEXRsrsQU8jwRsSCkXp6IOLz/TJtj/c9svfp6tX37njdTX7u9ikZayCNVnojuum9WBlghIa8DSEsWhF3AgA9W4fqDTwAAAP//ZXqAb6kAAAA="
+          "source": "data:;base64,H4sIAAAAAAAC/0zMQQrCMBCF4X1PMXSvNyi4FK8gIo9mWsdkkpJMsL29xI1Zzvcz7+5geAxEEco00XiDB12rSz5IHAciVkho5Q2Py36yXB3nc2RrdSlPO7bf576UJhLnWmiiBaHwQPRJ2XfnnI/NUgcrVOLagdZgouwEHb44K/9nvwEAAP//QWZEyLcAAAA="
         },
         "mode": 384
       },
@@ -90,9 +139,23 @@
         "path": "/etc/fedora-workstation-autorebase/initialize-chezmoi",
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/5ySz2/TThDF7/tXvG+/UZUctgaOtD6AEkEObaW4lZBKZG28k3ikzazZH0kD4n9HNimhiF642XrPn3nzxv//V+QYihVLQbLDysRWRUrQlD067mht2CmV2ZajMVvoDL9eOxZqv0zUJpiu5ca4OlKM7KUOWYRlM57gmwKcb4wDWzzJmS1ypIBAMSlg37IjBDIWOrxovIT1CgB4jYcHjAahLE9JsFzi/HywAINl7PyGpUkOsfV7fcTibMT2DFp3wXcU0gF3h46g9c64TJOeuTcHZ8T+O7FKJj1HmibxjrBcXiK1JEdooJSD4NXwumYFWC+EK1ydJjmO6WlShNbitaMNiZ2oX4DX6rtSWRK7PqauUIQsRV9RMcpsi1WOP5fBi9c69hsdUYc3qs+hFD1Sg5BlKPv3s0Nr9P/KZwV8vL2elUXrt1Sc9F74NP1QL+5v7ubXs3o6X5TPQw2W6fv7qq5mVTW/van753fT6WJWVWUWfnzbmdSWf1ml/zIeYqJtX5DWQzwSs3I0FLQfHEDT0tetZ83C6SJS2HFDf0i5sybRReItBfUjAAD//7moPpYJAwAA"
+          "source": "data:;base64,H4sIAAAAAAAC/5xTy27bOhTc8yvm5hpBvKDVdtlEixY22iySAFECFEgNgRaPpAPQpMqHHbfovxdi3kEDGN2JmjnD4XD4/39FCr5YsS3IbrBSoReBIiQlh4EHahUbIRLrcnLEGjLBta1hS/2PqWAbojIGUkO6JwCye7b4LoCid2sqHv8Vs8bZlrsi7EKktd6HU6RAfm9ioalVycRZVL6jONsqG8P+05HX5MOLYSE6r4aeG2XqQCGws7VP1rLtjqb4JQDjGmXAGg9wYo3s2lOIAtj2bAielIb0bxKPoZ0AAG5xc4NJBsryWaLLJQ4PMwXIlCPjOrZNNAi928p7WRxMWB9AysG7gXzc4Wo3EKTcKJNoOmpu1c4oq/9dsYoqvpRUTeQNYbk8RuzJ3ot6islbvMvLlgWgnSWc4ORpJ8MhPuwUIKV10lBHVk/Fo8B78VuIZCOb0aasUPhk7+5sklgXqxTuDoM3b+s+32CIBnwQow8h6JYa+GRz2M9LDikxvoyxOl8vzhblq/5k4Nv8S315fX51erao56eX5UtTmTL/fF3V1aKqTi/O6/H703x+uaiqMlm+/Tio2Jd/Oco4eVfMMSApsz2yamUoB7TNDKDp6efasWTLcRbIb7ihV1AatIo0y80WfwIAAP//3nEQKPcDAAA="
         },
         "mode": 493
+      }
+    ],
+    "filesystems": [
+      {
+        "device": "/dev/disk/by-partlabel/boot",
+        "format": "ext4",
+        "label": "boot",
+        "wipeFilesystem": true
+      },
+      {
+        "device": "/dev/disk/by-partlabel/root",
+        "format": "xfs",
+        "label": "root",
+        "wipeFilesystem": true
       }
     ]
   },
@@ -141,12 +204,12 @@
         "name": "fedora-workstation-unsigned-autorebase.service"
       },
       {
-        "contents": "[Unit]\nDescription=Rebase to the signed Fedora workstation image\nConditionPathExists=/etc/fedora-workstation-autorebase/unverified\nConditionPathExists=!/etc/fedora-workstation-autorebase/signed\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nStandardOutput=journal+console\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/unverified)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest\nExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id \u003e /etc/fedora-workstation-autorebase/signed'\nExecStart=/usr/bin/systemctl disable fedora-workstation-signed-autorebase.service\nExecStart=/usr/bin/systemctl reboot\n\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Rebase to the signed Fedora workstation image\nConditionPathExists=/etc/fedora-workstation-autorebase/unverified\nConditionPathExists=!/etc/fedora-workstation-autorebase/signed\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nStandardOutput=journal+console\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/unverified)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecCondition=/bin/bash -c 'rpm-ostree status --booted | grep -Fq \"ostree-unverified-registry:ghcr.io/xtruder/fedora-workstation:latest\"'\nExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest\nExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id \u003e /etc/fedora-workstation-autorebase/signed'\nExecStart=/usr/bin/systemctl disable fedora-workstation-signed-autorebase.service\nExecStart=/usr/bin/systemctl reboot\n\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "fedora-workstation-signed-autorebase.service"
       },
       {
-        "contents": "[Unit]\nDescription=Finish Fedora workstation VM bootstrap\nConditionPathExists=/etc/fedora-workstation-autorebase/signed\nConditionPathExists=!/etc/fedora-workstation-autorebase/complete\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/signed)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecStart=/usr/bin/loginctl enable-linger offlinehq\nExecStart=/usr/bin/systemctl set-default graphical.target\nExecStart=/usr/bin/systemctl enable --now sshd.service\nExecStart=/usr/bin/systemctl enable --now gdm.service\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/complete\nExecStart=/usr/bin/systemctl disable fedora-workstation-bootstrap.service\n\n[Install]\nWantedBy=multi-user.target\n",
+        "contents": "[Unit]\nDescription=Finish Fedora workstation VM bootstrap\nConditionPathExists=/etc/fedora-workstation-autorebase/signed\nConditionPathExists=!/etc/fedora-workstation-autorebase/complete\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/signed)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecCondition=/bin/bash -c 'rpm-ostree status --booted | grep -Fq \"ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest\"'\nExecStart=/usr/bin/loginctl enable-linger offlinehq\nExecStart=/usr/bin/systemctl set-default graphical.target\nExecStart=/usr/bin/systemctl enable --now sshd.service\nExecStart=/usr/bin/systemctl enable --now gdm.service\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/complete\nExecStart=/usr/bin/systemctl disable fedora-workstation-bootstrap.service\n\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "fedora-workstation-bootstrap.service"
       },

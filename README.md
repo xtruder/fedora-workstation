@@ -186,6 +186,64 @@ autorebase state under `/etc/fedora-workstation-autorebase/` makes each stage
 idempotent across the required reboots. Initial chezmoi setup does not access
 1Password. Sign in to 1Password first, then set `hermes = true` in
 `~/.config/chezmoi/chezmoi.toml` and run `chezmoi apply`.
+Nested Incus configuration is also optional; set `incus = true` only on hosts
+that should receive the Incus network, storage pool, and profiles.
+
+For a disposable Incus test, attach an unmodified official Fedora CoreOS live
+ISO and use a disk of at least 10 GiB. The Ignition config assumes the standard
+FCOS `/dev/sda` partition layout and recreates the boot and root partitions on
+first boot. It expands `/boot` to 2 GiB because the workstation initramfs and
+the FCOS rollback deployment do not fit in FCOS's default 384 MiB partition.
+
+```sh
+FCOS_ISO=/tmp/fedora-coreos-live.iso
+
+incus init fedora-workstation-e2e --empty --vm \
+  -c limits.cpu=8 \
+  -c limits.memory=16GiB \
+  -c security.secureboot=false \
+  -d root,size=50GiB
+incus config device add fedora-workstation-e2e install disk \
+  source="$FCOS_ISO" \
+  boot.priority=10
+incus start fedora-workstation-e2e
+incus console fedora-workstation-e2e --type=vga
+```
+
+From the live environment, confirm the target with `lsblk`, then install:
+
+```sh
+sudo coreos-installer install \
+  -I https://raw.githubusercontent.com/xtruder/fedora-workstation/main/ignition/fedora-workstation.ign \
+  --console ttyS0,115200n8 \
+  --console tty0 \
+  /dev/sda
+```
+
+Stop the VM after installation, remove the ISO device, and start it from disk:
+
+```sh
+incus stop fedora-workstation-e2e --force
+incus config device remove fedora-workstation-e2e install
+incus start fedora-workstation-e2e
+incus console fedora-workstation-e2e
+```
+
+Do not use `coreos-installer iso ignition embed` for unattended installation:
+it configures the live environment but does not install the target disk. Use
+only a disposable VM name for this test. The VM reboots after each rebase, so
+temporary `incus exec` failures are expected. After the final reboot, verify
+`rpm-ostree status --booted`, `systemctl is-active incus-agent`, `findmnt
+/boot`, `findmnt /boot/efi`, and the state markers in
+`/etc/fedora-workstation-autorebase/`. The final `chezmoi` marker is created
+only after GDM has started an active Wayland session.
+
+The preseeded `fs_type` must remain `xfs` for this FCOS layout. The Incus
+preseed selects a `dir` pool for non-Btrfs filesystems; setting `fs_type` to
+`btrfs` on the XFS root makes Incus reject the storage pool path. If chezmoi
+initialization fails, check that `~/.config` and `~/.config/systemd/user` are
+owned by `offlinehq`. Patterns in `.chezmoiignore.tmpl` are root-relative;
+recursive patterns use `**/pattern`, not `/**/pattern`.
 
 ## Installing
 

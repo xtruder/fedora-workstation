@@ -1,7 +1,8 @@
 {{- $name := promptStringOnce . "name" "Your name" -}}
 {{- $email := promptStringOnce . "email" "Your email" -}}
-{{- $fs_choices := list "ext4" "btrfs" -}}
+{{- $fs_choices := list "ext4" "btrfs" "xfs" -}}
 {{- $fs_type := promptChoiceOnce . "fs_type" "What is your filesystem type" $fs_choices -}}
+{{- $isIncus := promptBoolOnce . "incus" "Do you want to configure Incus?" -}}
 {{- $isWork := promptBoolOnce . "work" "Is this a work account?" -}}
 {{- $isCrypto := promptBoolOnce . "crypto" "Do you want to enable crypto?" -}}
 {{- $isGaming := promptBoolOnce . "gaming" "Do you want to enable gaming?" -}}
@@ -14,6 +15,7 @@
 
   fs_type = "{{ $fs_type }}"
 
+  incus = {{ $isIncus }}
   work = {{ $isWork }}
   crypto = {{ $isCrypto }}
   gaming = {{ $isGaming }}

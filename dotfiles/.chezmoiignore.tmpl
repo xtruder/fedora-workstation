@@ -1,14 +1,19 @@
 {{ if not .work }}
-/**/gpg-agent*.socket
-/**/code.desktop
-/**/cursor.desktop
-/**/cursor.svg
+**/gpg-agent*.socket
+**/code.desktop
+**/cursor.desktop
+**/cursor.svg
 .local/bin/cursor
 install-ngrok.sh
 {{ end }}
 
 {{ if not .crypto }}
-/**/*trezor-suite*
+**/*trezor-suite*
+{{ end }}
+
+{{ if not .incus }}
+incus-preseed.yaml
+incus-preseed.sh
 {{ end }}
 
 {{ if not .hermes }}
