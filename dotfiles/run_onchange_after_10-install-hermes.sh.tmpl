@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{- if .hermes }}
+# Compatibility set: Agent v2026.8.19, WebUI exp-v0.52.261, Cua Driver 0.20.0.
+installer=$(mktemp)
+trap 'rm -f "$installer"' EXIT
+curl -fsSL \
+  https://raw.githubusercontent.com/NousResearch/hermes-agent/fcbd1076a93841fa88855acce810e342a5b78101/install.sh \
+  -o "$installer"
+bash "$installer" \
+  --commit fcbd1076a93841fa88855acce810e342a5b78101 \
+  --force-commit \
+  --skip-setup \
+  --skip-computer-use \
+  --non-interactive
+
+git -C "$HOME/.hermes/hermes-agent" checkout --detach fcbd1076a93841fa88855acce810e342a5b78101
+"$HOME/.hermes/bin/uv" pip install \
+  --python "$HOME/.hermes/hermes-agent/venv/bin/python" \
+  --editable "$HOME/.hermes/hermes-agent[all]"
+ln -sfn "$HOME/.hermes/hermes-agent/venv/bin/hermes" "$HOME/.local/bin/hermes"
+
+curl -fsSL \
+  https://github.com/trycua/cua/releases/download/cua-driver-rs-v0.20.0/install.sh \
+  -o "$installer"
+printf '%s  %s\n' \
+  317ba3a49fdba10f2a7f1b9f392c1bc1b7657f3aae85e1e2e43684cf17a1bf3b \
+  "$installer" | sha256sum --check
+CUA_DRIVER_RS_VERSION=cua-driver-rs-v0.20.0 bash "$installer"
+
+if [[ ! -d $HOME/.hermes/hermes-webui/.git ]]; then
+  git clone https://github.com/nesquena/hermes-webui.git "$HOME/.hermes/hermes-webui"
+fi
+git -C "$HOME/.hermes/hermes-webui" fetch origin a00b02fccb0c93ad4046df84666539d9b47cd1b3
+git -C "$HOME/.hermes/hermes-webui" checkout --detach a00b02fccb0c93ad4046df84666539d9b47cd1b3
+"$HOME/.hermes/bin/uv" pip install \
+  --python "$HOME/.hermes/hermes-agent/venv/bin/python" \
+  --editable "$HOME/.hermes/hermes-webui"
+
+# The upstream installer owns this messaging unit. This profile uses its own
+# API-enabled unit so chezmoi remains authoritative.
+systemctl --user disable --now hermes-gateway.service 2>/dev/null || true
+{{- end }}

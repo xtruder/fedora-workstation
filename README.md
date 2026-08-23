@@ -17,6 +17,7 @@ hardware utilities (fw-fanctrl, fw-ectool), and developer tools.
 - [How it's built](#how-its-built)
 - [Repository layout](#repository-layout)
 - [Building locally](#building-locally)
+- [Incus VM bootstrap](#incus-vm-bootstrap)
 - [Installing](#installing)
   - [From an ISO](#from-an-iso)
   - [Rebasing an existing Silverblue install](#rebasing-an-existing-silverblue-install)
@@ -148,6 +149,44 @@ bluebuild generate ./recipes/recipe.yml -o Containerfile
 bluebuild build ./recipes/recipe.yml
 ```
 
+## Incus VM bootstrap
+
+[`ignition/fedora-workstation.bu`](ignition/fedora-workstation.bu) bootstraps
+an Incus Fedora CoreOS/uCore VM using the same pattern as the homelab server.
+It also configures Incus's 9p agent share and SELinux policy so `incus exec`
+continues working after reboot.
+
+Generate strict Ignition JSON with:
+
+```sh
+just ignition
+```
+
+The bootstrap then follows these stages:
+
+1. Rebase from uCore to the unsigned
+   `ghcr.io/xtruder/fedora-workstation:latest` deployment and reboot.
+2. Rebase to the signed transport after the workstation image supplies its
+   signing policy, then reboot again.
+3. Enable GDM autologin, SSH, and lingering for `offlinehq`.
+4. Wait for the autologged-in GNOME session and apply chezmoi using a
+   preseeded default config with every optional profile disabled.
+
+Boot the VM from the official Fedora CoreOS ISO and install to its system disk
+using the generated Ignition file:
+
+```sh
+sudo coreos-installer install \
+  -I https://raw.githubusercontent.com/xtruder/fedora-workstation/main/ignition/fedora-workstation.ign \
+  /dev/sda
+```
+
+Confirm the target disk with `lsblk` before running the installer. The
+autorebase state under `/etc/fedora-workstation-autorebase/` makes each stage
+idempotent across the required reboots. Initial chezmoi setup does not access
+1Password. Sign in to 1Password first, then set `hermes = true` in
+`~/.config/chezmoi/chezmoi.toml` and run `chezmoi apply`.
+
 ## Installing
 
 ### From an ISO
@@ -188,7 +227,8 @@ ujust dotfiles
 
 This runs `chezmoi init --apply` against this repo (over HTTPS, prompting
 for config values like name, email, filesystem type, and feature flags:
-work / crypto / gaming / multimedia) and rewrites the push remote to SSH.
+work / crypto / gaming / multimedia / hermes) and rewrites the push remote to
+SSH.
 
 To pull updates afterward:
 
@@ -216,6 +256,10 @@ inputs change:
 - `run_onchange_install-trezor-suite.sh.tmpl` — installs Trezor Suite
 - `run_onchange_incus-preseed.sh.tmpl` — applies an Incus preseed
   (`incus-preseed.yaml.tmpl`)
+- `run_onchange_after_10-install-hermes.sh.tmpl` — installs the pinned Hermes Agent,
+  WebUI, and Cua Driver compatibility set when `hermes = true`
+- `run_onchange_after_20-configure-hermes.sh.tmpl` — reads the `Private/Hermes`
+  1Password item, configures RDP, and starts the optional user services
 
 ## Post-install setup
 
@@ -433,10 +477,17 @@ The `bling` module installs 1Password. Sign in, then ensure your browser
 is listed in `/etc/1password/custom_allowed_browsers` so the browser
 extension can talk to the desktop app.
 
+The optional Hermes profile requires desktop app CLI integration. Keep
+`hermes = false` during initial setup, sign in to 1Password, then enable the
+flag in the local chezmoi config and run `chezmoi apply`. The required item
+fields and manual Traefik examples are documented in
+[`examples/hermes/`](examples/hermes/).
+
 ### Nextcloud sync
 
-Configure your Nextcloud account in the GNOME Online Accounts settings,
-or mount it via WebDAV using `davfs2` (installed by the image).
+The Nextcloud Desktop Flatpak is installed for the `work` profile. Configure
+its account interactively after login. GNOME Online Accounts and WebDAV via
+`davfs2` remain available as alternatives.
 
 ### Firefox
 

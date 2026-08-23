@@ -1,0 +1,16 @@
+[Unit]
+Description=Hermes WebUI
+Wants=network-online.target
+After=network-online.target hermes-api.service
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/hermes/services.env
+Environment=PATH=%h/.local/bin:%h/.hermes/bin:/usr/local/bin:/usr/bin
+WorkingDirectory=%h/.hermes/hermes-webui
+ExecStart=/bin/bash %h/.hermes/hermes-webui/start.sh --foreground --no-browser
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

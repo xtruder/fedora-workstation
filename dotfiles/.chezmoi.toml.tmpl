@@ -2,10 +2,11 @@
 {{- $email := promptStringOnce . "email" "Your email" -}}
 {{- $fs_choices := list "ext4" "btrfs" -}}
 {{- $fs_type := promptChoiceOnce . "fs_type" "What is your filesystem type" $fs_choices -}}
-{{- $isWork := promptBoolOnce . "isWork" "Is this a work account?" -}}
-{{- $isCrypto := promptBoolOnce . "isCrypto" "Do you want to enable crypto?" -}}
-{{- $isGaming := promptBoolOnce . "isGaming" "Do you want to enable gaming?" -}}
-{{- $isMultimedia := promptBoolOnce . "isMultimedia" "Do you want to enable multimedia?" -}}
+{{- $isWork := promptBoolOnce . "work" "Is this a work account?" -}}
+{{- $isCrypto := promptBoolOnce . "crypto" "Do you want to enable crypto?" -}}
+{{- $isGaming := promptBoolOnce . "gaming" "Do you want to enable gaming?" -}}
+{{- $isMultimedia := promptBoolOnce . "multimedia" "Do you want to enable multimedia?" -}}
+{{- $isHermes := promptBoolOnce . "hermes" "Do you want to enable Hermes?" -}}
 
 [data]
   name = "{{ $name }}"
@@ -17,3 +18,4 @@
   crypto = {{ $isCrypto }}
   gaming = {{ $isGaming }}
   multimedia = {{ $isMultimedia }}
+  hermes = {{ $isHermes }}

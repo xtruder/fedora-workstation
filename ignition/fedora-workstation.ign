@@ -1,0 +1,160 @@
+{
+  "ignition": {
+    "version": "3.5.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "groups": [
+          "wheel",
+          "sudo"
+        ],
+        "name": "offlinehq",
+        "sshAuthorizedKeys": [
+          "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBn3XS9FgqskCni3d8LIw20+vUutFK6F8P2wcjZVMbDJLtzQO194hXjQoveEN7RZ8EdiJBjme3r3XdwwoMcNQUgMSpGiFtD2oG3zoApFJf6y7T5P25PdZyK+Tlb2YySCLQ== (none)"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "directories": [
+      {
+        "path": "/etc/fedora-workstation-autorebase",
+        "mode": 493
+      },
+      {
+        "group": {
+          "name": "offlinehq"
+        },
+        "path": "/home/offlinehq/.config/chezmoi",
+        "user": {
+          "name": "offlinehq"
+        },
+        "mode": 448
+      }
+    ],
+    "files": [
+      {
+        "overwrite": true,
+        "path": "/etc/hostname",
+        "contents": {
+          "compression": "",
+          "source": "data:,hermes-desktop"
+        },
+        "mode": 420
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/gdm/custom.conf",
+        "contents": {
+          "compression": "",
+          "source": "data:,%5Bdaemon%5D%0AAutomaticLoginEnable%3DTrue%0AAutomaticLogin%3Dofflinehq%0A"
+        },
+        "mode": 420
+      },
+      {
+        "group": {
+          "name": "offlinehq"
+        },
+        "overwrite": true,
+        "path": "/home/offlinehq/.config/chezmoi/chezmoi.toml",
+        "user": {
+          "name": "offlinehq"
+        },
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/0zLQarCMBCH8X1PMXT/3g0KLsUriMhfM6kxmaRMJmhvL3Eh2f4+vrOD4TIRZQjTQvMJEXRsrsQU8jwRsSCkXp6IOLz/TJtj/c9svfp6tX37njdTX7u9ikZayCNVnojuum9WBlghIa8DSEsWhF3AgA9W4fqDTwAAAP//ZXqAb6kAAAA="
+        },
+        "mode": 384
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/cil/run-incus_agent-incus--agent.cil",
+        "contents": {
+          "compression": "",
+          "source": "data:,(filecon%20%22%2Frun%2Fincus_agent%2Fincus-agent%22%20any%20(system_u%20object_r%20bin_t%20((s0)(s0))))%0A"
+        },
+        "mode": 256
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/udev/rules.d/99-incus-agent.rules",
+        "contents": {
+          "compression": "",
+          "source": "data:,SYMLINK%3D%3D%22virtio-ports%2Forg.linuxcontainers.incus%22%2C%20TAG%2B%3D%22systemd%22%2C%20ENV%7BSYSTEMD_WANTS%7D%2B%3D%22incus-agent.service%22%0A"
+        },
+        "mode": 256
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/fedora-workstation-autorebase/initialize-chezmoi",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/5ySz2/TThDF7/tXvG+/UZUctgaOtD6AEkEObaW4lZBKZG28k3ikzazZH0kD4n9HNimhiF642XrPn3nzxv//V+QYihVLQbLDysRWRUrQlD067mht2CmV2ZajMVvoDL9eOxZqv0zUJpiu5ca4OlKM7KUOWYRlM57gmwKcb4wDWzzJmS1ypIBAMSlg37IjBDIWOrxovIT1CgB4jYcHjAahLE9JsFzi/HywAINl7PyGpUkOsfV7fcTibMT2DFp3wXcU0gF3h46g9c64TJOeuTcHZ8T+O7FKJj1HmibxjrBcXiK1JEdooJSD4NXwumYFWC+EK1ydJjmO6WlShNbitaMNiZ2oX4DX6rtSWRK7PqauUIQsRV9RMcpsi1WOP5fBi9c69hsdUYc3qs+hFD1Sg5BlKPv3s0Nr9P/KZwV8vL2elUXrt1Sc9F74NP1QL+5v7ubXs3o6X5TPQw2W6fv7qq5mVTW/van753fT6WJWVWUWfnzbmdSWf1ml/zIeYqJtX5DWQzwSs3I0FLQfHEDT0tetZ83C6SJS2HFDf0i5sybRReItBfUjAAD//7moPpYJAwAA"
+        },
+        "mode": 493
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "enabled": true,
+        "name": "sshd.service"
+      },
+      {
+        "mask": true,
+        "name": "sshd.socket"
+      },
+      {
+        "enabled": true,
+        "name": "systemd-timesyncd.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Mount Incus agent 9p config\n\n[Mount]\nWhat=config\nWhere=/run/incus_9pconfig\nType=9p\nOptions=access=0,trans=virtio,size=1048576\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": false,
+        "name": "run-incus_9pconfig.mount"
+      },
+      {
+        "contents": "[Unit]\nDescription=Automount Incus agent 9p config\n\n[Automount]\nWhere=/run/incus_9pconfig\nTimeoutIdleSec=15\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "run-incus_9pconfig.automount"
+      },
+      {
+        "contents": "[Unit]\nDescription=Mount tmpfs for Incus agent\n\n[Mount]\nWhat=tmpfs\nWhere=/run/incus_agent\nType=tmpfs\nOptions=noatime,nosuid,nodev,mode=0700,size=50M\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "run-incus_agent.mount"
+      },
+      {
+        "contents": "[Unit]\nDescription=Install Incus agent SELinux policy\nConditionFirstBoot=yes\nBefore=incus-agent.service\nAfter=run-incus_agent.mount\n\n[Service]\nType=oneshot\nExecStart=/usr/bin/semodule -i /etc/cil/run-incus_agent-incus--agent.cil\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "setup-incus-agent.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Incus agent\nDocumentation=https://linuxcontainers.org/incus/docs/main/\nBefore=multi-user.target\nDefaultDependencies=no\nAfter=run-incus_agent.mount\n\n[Service]\nType=notify\nWorkingDirectory=-/run/incus_agent\nExecStartPre=/usr/bin/cp -Ra /run/incus_9pconfig/. /run/incus_agent\nExecStartPre=/usr/bin/restorecon -Rv /run/incus_agent\nExecStart=/run/incus_agent/incus-agent\nRestart=on-failure\nRestartSec=5s\nStartLimitInterval=60\nStartLimitBurst=10\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "incus-agent.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Rebase to the unsigned Fedora workstation image\nConditionPathExists=!/etc/fedora-workstation-autorebase/unverified\nConditionPathExists=!/etc/fedora-workstation-autorebase/signed\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nStandardOutput=journal+console\nExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-unverified-registry:ghcr.io/xtruder/fedora-workstation:latest\nExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id \u003e /etc/fedora-workstation-autorebase/unverified'\nExecStart=/usr/bin/systemctl disable fedora-workstation-unsigned-autorebase.service\nExecStart=/usr/bin/systemctl reboot\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "fedora-workstation-unsigned-autorebase.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Rebase to the signed Fedora workstation image\nConditionPathExists=/etc/fedora-workstation-autorebase/unverified\nConditionPathExists=!/etc/fedora-workstation-autorebase/signed\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nStandardOutput=journal+console\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/unverified)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest\nExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id \u003e /etc/fedora-workstation-autorebase/signed'\nExecStart=/usr/bin/systemctl disable fedora-workstation-signed-autorebase.service\nExecStart=/usr/bin/systemctl reboot\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "fedora-workstation-signed-autorebase.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Finish Fedora workstation VM bootstrap\nConditionPathExists=/etc/fedora-workstation-autorebase/signed\nConditionPathExists=!/etc/fedora-workstation-autorebase/complete\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nExecCondition=/bin/bash -c 'test \"$(cat /etc/fedora-workstation-autorebase/signed)\" != \"$(cat /proc/sys/kernel/random/boot_id)\"'\nExecStart=/usr/bin/loginctl enable-linger offlinehq\nExecStart=/usr/bin/systemctl set-default graphical.target\nExecStart=/usr/bin/systemctl enable --now sshd.service\nExecStart=/usr/bin/systemctl enable --now gdm.service\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/complete\nExecStart=/usr/bin/systemctl disable fedora-workstation-bootstrap.service\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "fedora-workstation-bootstrap.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Initialize Fedora workstation dotfiles\nConditionPathExists=/etc/fedora-workstation-autorebase/signed\nConditionPathExists=/etc/fedora-workstation-autorebase/complete\nConditionPathExists=!/etc/fedora-workstation-autorebase/chezmoi\nAfter=network-online.target gdm.service fedora-workstation-bootstrap.service\nWants=network-online.target\n\n[Service]\nType=oneshot\nTimeoutStartSec=infinity\nExecStart=/etc/fedora-workstation-autorebase/initialize-chezmoi\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/chezmoi\nExecStart=/usr/bin/systemctl disable fedora-workstation-chezmoi.service\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "fedora-workstation-chezmoi.service"
+      }
+    ]
+  }
+}

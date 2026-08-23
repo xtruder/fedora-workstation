@@ -1,0 +1,23 @@
+http:
+  routers:
+    webui:
+      entryPoints: [websecure]
+      rule: Host(`web.hermes.x-truder.net`)
+      service: webui
+      tls:
+        certResolver: letsencrypt
+    gateway:
+      entryPoints: [websecure]
+      rule: Host(`gw.hermes.x-truder.net`)
+      service: gateway
+      tls:
+        certResolver: letsencrypt
+  services:
+    webui:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8787
+    gateway:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8642

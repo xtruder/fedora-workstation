@@ -1,0 +1,285 @@
+variant: fcos
+version: 1.6.0
+
+passwd:
+  users:
+    - name: offlinehq
+      groups:
+        - wheel
+        - sudo
+      ssh_authorized_keys:
+        - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBn3XS9FgqskCni3d8LIw20+vUutFK6F8P2wcjZVMbDJLtzQO194hXjQoveEN7RZ8EdiJBjme3r3XdwwoMcNQUgMSpGiFtD2oG3zoApFJf6y7T5P25PdZyK+Tlb2YySCLQ== (none)
+
+storage:
+  directories:
+    - path: /etc/fedora-workstation-autorebase
+      mode: 0755
+    - path: /home/offlinehq/.config/chezmoi
+      mode: 0700
+      user:
+        name: offlinehq
+      group:
+        name: offlinehq
+
+  files:
+    - path: /etc/hostname
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: hermes-desktop
+
+    - path: /etc/gdm/custom.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          [daemon]
+          AutomaticLoginEnable=True
+          AutomaticLogin=offlinehq
+
+    - path: /home/offlinehq/.config/chezmoi/chezmoi.toml
+      overwrite: true
+      mode: 0600
+      user:
+        name: offlinehq
+      group:
+        name: offlinehq
+      contents:
+        inline: |
+          [data]
+            name = "Jaka Hudoklin"
+            email = "jaka@x-truder.net"
+            fs_type = "btrfs"
+            work = false
+            crypto = false
+            gaming = false
+            multimedia = false
+            hermes = false
+
+    - path: /etc/cil/run-incus_agent-incus--agent.cil
+      overwrite: true
+      mode: 0400
+      contents:
+        inline: |
+          (filecon "/run/incus_agent/incus-agent" any (system_u object_r bin_t ((s0)(s0))))
+
+    - path: /etc/udev/rules.d/99-incus-agent.rules
+      overwrite: true
+      mode: 0400
+      contents:
+        inline: |
+          SYMLINK=="virtio-ports/org.linuxcontainers.incus", TAG+="systemd", ENV{SYSTEMD_WANTS}+="incus-agent.service"
+
+    - path: /etc/fedora-workstation-autorebase/initialize-chezmoi
+      overwrite: true
+      mode: 0755
+      contents:
+        inline: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          uid=$(id -u offlinehq)
+          graphical_session_running() {
+            local id session_uid user rest
+            while read -r id session_uid user rest; do
+              if [[ $user == offlinehq ]] &&
+                 [[ $(loginctl show-session "$id" --property Type --value) == wayland ]] &&
+                 [[ $(loginctl show-session "$id" --property State --value) == active ]]; then
+                return 0
+              fi
+            done < <(loginctl list-sessions --no-legend)
+            return 1
+          }
+
+          until [[ -S /run/user/$uid/bus ]] && graphical_session_running; do
+            sleep 2
+          done
+
+          exec runuser -u offlinehq -- env \
+            HOME=/home/offlinehq \
+            XDG_RUNTIME_DIR=/run/user/$uid \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus \
+            systemctl --user enable --now \
+              chezmoi-init.service \
+              chezmoi-update.timer
+
+systemd:
+  units:
+    - name: sshd.service
+      enabled: true
+
+    - name: sshd.socket
+      mask: true
+
+    - name: systemd-timesyncd.service
+      enabled: true
+
+    - name: run-incus_9pconfig.mount
+      enabled: false
+      contents: |
+        [Unit]
+        Description=Mount Incus agent 9p config
+
+        [Mount]
+        What=config
+        Where=/run/incus_9pconfig
+        Type=9p
+        Options=access=0,trans=virtio,size=1048576
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: run-incus_9pconfig.automount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Automount Incus agent 9p config
+
+        [Automount]
+        Where=/run/incus_9pconfig
+        TimeoutIdleSec=15
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: run-incus_agent.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount tmpfs for Incus agent
+
+        [Mount]
+        What=tmpfs
+        Where=/run/incus_agent
+        Type=tmpfs
+        Options=noatime,nosuid,nodev,mode=0700,size=50M
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: setup-incus-agent.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install Incus agent SELinux policy
+        ConditionFirstBoot=yes
+        Before=incus-agent.service
+        After=run-incus_agent.mount
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/semodule -i /etc/cil/run-incus_agent-incus--agent.cil
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: incus-agent.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Incus agent
+        Documentation=https://linuxcontainers.org/incus/docs/main/
+        Before=multi-user.target
+        DefaultDependencies=no
+        After=run-incus_agent.mount
+
+        [Service]
+        Type=notify
+        WorkingDirectory=-/run/incus_agent
+        ExecStartPre=/usr/bin/cp -Ra /run/incus_9pconfig/. /run/incus_agent
+        ExecStartPre=/usr/bin/restorecon -Rv /run/incus_agent
+        ExecStart=/run/incus_agent/incus-agent
+        Restart=on-failure
+        RestartSec=5s
+        StartLimitInterval=60
+        StartLimitBurst=10
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fedora-workstation-unsigned-autorebase.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Rebase to the unsigned Fedora workstation image
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/unverified
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/signed
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        StandardOutput=journal+console
+        ExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-unverified-registry:ghcr.io/xtruder/fedora-workstation:latest
+        ExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id > /etc/fedora-workstation-autorebase/unverified'
+        ExecStart=/usr/bin/systemctl disable fedora-workstation-unsigned-autorebase.service
+        ExecStart=/usr/bin/systemctl reboot
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fedora-workstation-signed-autorebase.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Rebase to the signed Fedora workstation image
+        ConditionPathExists=/etc/fedora-workstation-autorebase/unverified
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/signed
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        StandardOutput=journal+console
+        ExecCondition=/bin/bash -c 'test "$(cat /etc/fedora-workstation-autorebase/unverified)" != "$(cat /proc/sys/kernel/random/boot_id)"'
+        ExecStart=/usr/bin/rpm-ostree rebase --bypass-driver ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest
+        ExecStart=/bin/bash -c 'cat /proc/sys/kernel/random/boot_id > /etc/fedora-workstation-autorebase/signed'
+        ExecStart=/usr/bin/systemctl disable fedora-workstation-signed-autorebase.service
+        ExecStart=/usr/bin/systemctl reboot
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fedora-workstation-bootstrap.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Finish Fedora workstation VM bootstrap
+        ConditionPathExists=/etc/fedora-workstation-autorebase/signed
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/complete
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        ExecCondition=/bin/bash -c 'test "$(cat /etc/fedora-workstation-autorebase/signed)" != "$(cat /proc/sys/kernel/random/boot_id)"'
+        ExecStart=/usr/bin/loginctl enable-linger offlinehq
+        ExecStart=/usr/bin/systemctl set-default graphical.target
+        ExecStart=/usr/bin/systemctl enable --now sshd.service
+        ExecStart=/usr/bin/systemctl enable --now gdm.service
+        ExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/complete
+        ExecStart=/usr/bin/systemctl disable fedora-workstation-bootstrap.service
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fedora-workstation-chezmoi.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Initialize Fedora workstation dotfiles
+        ConditionPathExists=/etc/fedora-workstation-autorebase/signed
+        ConditionPathExists=/etc/fedora-workstation-autorebase/complete
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/chezmoi
+        After=network-online.target gdm.service fedora-workstation-bootstrap.service
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        TimeoutStartSec=infinity
+        ExecStart=/etc/fedora-workstation-autorebase/initialize-chezmoi
+        ExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/chezmoi
+        ExecStart=/usr/bin/systemctl disable fedora-workstation-chezmoi.service
+
+        [Install]
+        WantedBy=multi-user.target

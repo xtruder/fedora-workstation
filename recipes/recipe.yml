@@ -69,6 +69,11 @@ modules:
       - usbguard-dbus
       - powertop
       - dbus-tools
+      - at-spi2-core
+      - chromium
+      - gnome-remote-desktop
+      - openssh-server
+      - openssl
     # bench
       - stress-ng
       - s-tui

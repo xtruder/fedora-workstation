@@ -1,0 +1,17 @@
+[Unit]
+Description=Hermes Agent API gateway
+Wants=network-online.target
+After=network-online.target graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/hermes/services.env
+Environment=PATH=%h/.local/bin:%h/.hermes/bin:/usr/local/bin:/usr/bin
+Environment=CUA_DRIVER_RS_ENABLE_WAYLAND=1
+ExecStart=%h/.local/bin/hermes gateway run
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
