@@ -139,7 +139,7 @@
         "path": "/etc/fedora-workstation-autorebase/initialize-chezmoi",
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/5xTy27bOhTc8yvm5hpBvKDVdtlEixY22iySAFECFEgNgRaPpAPQpMqHHbfovxdi3kEDGN2JmjnD4XD4/39FCr5YsS3IbrBSoReBIiQlh4EHahUbIRLrcnLEGjLBta1hS/2PqWAbojIGUkO6JwCye7b4LoCid2sqHv8Vs8bZlrsi7EKktd6HU6RAfm9ioalVycRZVL6jONsqG8P+05HX5MOLYSE6r4aeG2XqQCGws7VP1rLtjqb4JQDjGmXAGg9wYo3s2lOIAtj2bAielIb0bxKPoZ0AAG5xc4NJBsryWaLLJQ4PMwXIlCPjOrZNNAi928p7WRxMWB9AysG7gXzc4Wo3EKTcKJNoOmpu1c4oq/9dsYoqvpRUTeQNYbk8RuzJ3ot6islbvMvLlgWgnSWc4ORpJ8MhPuwUIKV10lBHVk/Fo8B78VuIZCOb0aasUPhk7+5sklgXqxTuDoM3b+s+32CIBnwQow8h6JYa+GRz2M9LDikxvoyxOl8vzhblq/5k4Nv8S315fX51erao56eX5UtTmTL/fF3V1aKqTi/O6/H703x+uaiqMlm+/Tio2Jd/Oco4eVfMMSApsz2yamUoB7TNDKDp6efasWTLcRbIb7ihV1AatIo0y80WfwIAAP//3nEQKPcDAAA="
+          "source": "data:;base64,H4sIAAAAAAAC/5xTy27bOhTc8yvm5hpJvKDVdtlEixY22iySAFECFEgMgxaPpAPQpMqHHbfovxdini4awOhO1JkZDofD//8rUvDFkm1Bdo2lCp0IFCEpOfTcU6PYCJFYl6Nj1pAJrmkMW+q+jwXbEJUxkBrSvQwg21eLOwEUnVtR8fyvmNTONtwWYRsirfQ+mCIF8nsDC02NSiZOovItxclG2Rj2Z0dekQ87ZCFar/qOa2UWgUJgZxc+Wcu2PR7jpwCMq5UBazyNE2tk155CFMCmY0PwpDSkfxN4Au0EAHCD21uM8qAsXyU6n+PwMEOADDk2rmVbR4PQuY18lMXBiPUBpOy968nHLa63PUHKtTKJxoPmRm2NsvrfFauo4q6kqiOvCfP5CWJH9lHUU0ze4l1eNiwA7SzhFKcvOxkO8WmnACmtk4ZasnosngXei19CJBvZDDZlhcIn+3Bno8S6WKbwcBi8eVuP+QZD1OODGHwIQfdUwyebw35dckiJ4WUM1fl6eT4r/+hPHnybfllc3Vxcn53PFtOzq3LXVIZMP99Ui2pWVWeXF4vh+9N0ejWrqjJZvv/Yq9iVfznKwBzeJGSNo4eGDklJmX2SVUtDOakN6o5+rBxLthwngfyaaxpyuMuR78dNvVaRJrn9R+J3AAAA//+uzUWhHAQAAA=="
         },
         "mode": 493
       }

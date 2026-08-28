@@ -152,9 +152,8 @@ storage:
             HOME=/home/offlinehq \
             XDG_RUNTIME_DIR=/run/user/$uid \
             DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus \
-            systemctl --user enable --now \
-              chezmoi-init.service \
-              chezmoi-update.timer
+            bash -c 'systemctl --user enable --now chezmoi-init.service && \
+              systemctl --user enable --now chezmoi-update.timer'
 
 systemd:
   units:

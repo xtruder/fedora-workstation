@@ -8,25 +8,35 @@ asset={{ .asset | quote }}
 destination="$HOME/.local/share/libexec/{{ .filename }}"
 desktop_filename={{ .desktopFilename | quote }}
 signature_key_url={{ .signatureKeyUrl | quote }}
+version={{ get . "version" | default "" | quote }}
+url={{ get . "url" | default "" | quote }}
+fallback_url={{ get . "fallbackUrl" | default "" | quote }}
 version_file="${destination}.version"
 
 # Check for a new release once per day: {{ now | date "2006-01-02" }}
-if ! release=$(curl --fail --silent --show-error --location \
-    --retry 5 --retry-all-errors --retry-delay 2 \
-    --header "Accept: application/json" "$release_api_url"); then
-    if [[ -x "$destination" && -f "$version_file" ]]; then
-        echo "Could not check for a new ${name} release; keeping $(< "$version_file")" >&2
-        exit 0
+if [[ -z "$version" || -z "$url" ]]; then
+    if ! release=$(curl --fail --silent --show-error --location \
+        --retry 5 --retry-all-errors --retry-delay 2 \
+        --header "Accept: application/json" "$release_api_url"); then
+        if [[ -n "$fallback_url" ]]; then
+            version=latest
+            url=$fallback_url
+        elif [[ -x "$destination" && -f "$version_file" ]]; then
+            echo "Could not check for a new ${name} release; keeping $(< "$version_file")" >&2
+            exit 0
+        else
+            exit 1
+        fi
+    else
+        version=$(jq --exit-status --raw-output '.tag_name' <<< "$release")
+        asset=${asset//\{versionNoV\}/${version#v}}
+        asset=${asset//\{version\}/$version}
+        if ! url=$(jq --exit-status --raw-output --arg asset "$asset" \
+            '.assets[] | select(.name == $asset) | .browser_download_url' <<< "$release"); then
+            echo "Could not find ${asset} in the latest ${name} release" >&2
+            exit 1
+        fi
     fi
-    exit 1
-fi
-version=$(jq --exit-status --raw-output '.tag_name' <<< "$release")
-asset=${asset//\{versionNoV\}/${version#v}}
-asset=${asset//\{version\}/$version}
-if ! url=$(jq --exit-status --raw-output --arg asset "$asset" \
-    '.assets[] | select(.name == $asset) | .browser_download_url' <<< "$release"); then
-    echo "Could not find ${asset} in the latest ${name} release" >&2
-    exit 1
 fi
 
 if [[ -x "$destination" && -f "$version_file" && "$(< "$version_file")" == "$version" ]]; then

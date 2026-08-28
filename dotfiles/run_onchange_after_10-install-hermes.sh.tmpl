@@ -2,7 +2,7 @@
 set -euo pipefail
 
 {{- if .hermes }}
-# Compatibility set: Agent v2026.8.19, WebUI exp-v0.52.261, Cua Driver 0.20.0.
+# Compatibility set: Agent v2026.8.19, WebUI exp-v0.52.262, Cua Driver 0.20.0.
 installer=$(mktemp)
 trap 'rm -f "$installer"' EXIT
 curl -fsSL \
@@ -32,8 +32,8 @@ CUA_DRIVER_RS_VERSION=cua-driver-rs-v0.20.0 bash "$installer"
 if [[ ! -d $HOME/.hermes/hermes-webui/.git ]]; then
   git clone https://github.com/nesquena/hermes-webui.git "$HOME/.hermes/hermes-webui"
 fi
-git -C "$HOME/.hermes/hermes-webui" fetch origin a00b02fccb0c93ad4046df84666539d9b47cd1b3
-git -C "$HOME/.hermes/hermes-webui" checkout --detach a00b02fccb0c93ad4046df84666539d9b47cd1b3
+git -C "$HOME/.hermes/hermes-webui" fetch origin df65251d58191f1de4ca1894a0bc5b399ce4a4ec
+git -C "$HOME/.hermes/hermes-webui" checkout --detach df65251d58191f1de4ca1894a0bc5b399ce4a4ec
 "$HOME/.hermes/bin/uv" pip install \
   --python "$HOME/.hermes/hermes-agent/venv/bin/python" \
   --editable "$HOME/.hermes/hermes-webui"
