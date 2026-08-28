@@ -72,7 +72,7 @@ storage:
       overwrite: true
       mode: 0644
       contents:
-        inline: hermes-desktop
+        inline: antares
 
     - path: /etc/gdm/custom.conf
       overwrite: true
@@ -97,11 +97,11 @@ storage:
             email = "jaka@x-truder.net"
             fs_type = "xfs"
             incus = false
-            work = false
+            work = true
             crypto = false
             gaming = false
-            multimedia = false
-            hermes = false
+            multimedia = true
+            hermes = true
 
     - path: /etc/cil/run-incus_agent-incus--agent.cil
       overwrite: true
@@ -154,6 +154,74 @@ storage:
             DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus \
             bash -c 'systemctl --user enable --now chezmoi-init.service && \
               systemctl --user enable --now chezmoi-update.timer'
+
+    - path: /etc/fedora-workstation-autorebase/configure-rdp
+      overwrite: true
+      mode: 0755
+      contents:
+        inline: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          uid=$(id -u offlinehq)
+          credentials_file=/etc/fedora-workstation-autorebase/rdp-credentials
+          rdp_dir=/home/offlinehq/.local/share/gnome-remote-desktop
+
+          if [[ ! -s $credentials_file ]]; then
+            umask 077
+            password=$(openssl rand -base64 24)
+            credentials_tmp=$(mktemp "$credentials_file.XXXXXX")
+            trap 'rm -f "$credentials_tmp"' EXIT
+            {
+              printf 'RDP_USERNAME=%q\n' offlinehq
+              printf 'RDP_PASSWORD=%q\n' "$password"
+            } > "$credentials_tmp"
+            mv "$credentials_tmp" "$credentials_file"
+            trap - EXIT
+          fi
+          source "$credentials_file"
+
+          install -d -m 0700 -o offlinehq -g offlinehq "$rdp_dir"
+          if [[ ! -s $rdp_dir/tls.crt || ! -s $rdp_dir/tls.key ]]; then
+            runuser -u offlinehq -- openssl req -new -newkey rsa:4096 -days 720 -nodes -x509 \
+              -subj "/O=Antares/CN=$(hostname)" \
+              -out "$rdp_dir/tls.crt" \
+              -keyout "$rdp_dir/tls.key"
+          fi
+
+          graphical_session_running() {
+            local id session_uid user rest
+            while read -r id session_uid user rest; do
+              if [[ $user == offlinehq ]] &&
+                 [[ $(loginctl show-session "$id" --property Type --value) == wayland ]] &&
+                 [[ $(loginctl show-session "$id" --property State --value) == active ]]; then
+                return 0
+              fi
+            done < <(loginctl list-sessions --no-legend)
+            return 1
+          }
+
+          until [[ -S /run/user/$uid/bus ]] && graphical_session_running; do
+            sleep 2
+          done
+
+          exec runuser -u offlinehq -- env \
+            HOME=/home/offlinehq \
+            XDG_RUNTIME_DIR=/run/user/$uid \
+            DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus \
+            RDP_USERNAME="$RDP_USERNAME" \
+            RDP_PASSWORD="$RDP_PASSWORD" \
+            bash -c '
+              gsettings set org.gnome.desktop.remote-desktop.rdp tls-key "$HOME/.local/share/gnome-remote-desktop/tls.key"
+              gsettings set org.gnome.desktop.remote-desktop.rdp tls-cert "$HOME/.local/share/gnome-remote-desktop/tls.crt"
+              grdctl rdp set-credentials "$RDP_USERNAME" "$RDP_PASSWORD"
+              grdctl rdp disable-view-only
+              grdctl rdp disable-port-negotiation
+              grdctl rdp enable
+              gsettings set org.gnome.desktop.session idle-delay 0
+              gsettings set org.gnome.desktop.screensaver lock-enabled false
+              systemctl --user enable --now gnome-remote-desktop.service
+            '
 
 systemd:
   units:
@@ -334,6 +402,25 @@ systemd:
         ExecStart=/etc/fedora-workstation-autorebase/initialize-chezmoi
         ExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/chezmoi
         ExecStart=/usr/bin/systemctl disable fedora-workstation-chezmoi.service
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: fedora-workstation-rdp.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Configure GNOME Remote Desktop
+        ConditionPathExists=/etc/fedora-workstation-autorebase/complete
+        ConditionPathExists=!/etc/fedora-workstation-autorebase/rdp
+        After=gdm.service fedora-workstation-bootstrap.service
+
+        [Service]
+        Type=oneshot
+        TimeoutStartSec=infinity
+        ExecStart=/etc/fedora-workstation-autorebase/configure-rdp
+        ExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/rdp
+        ExecStart=/usr/bin/systemctl disable fedora-workstation-rdp.service
 
         [Install]
         WantedBy=multi-user.target

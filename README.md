@@ -151,16 +151,37 @@ bluebuild build ./recipes/recipe.yml
 
 ## Incus VM bootstrap
 
-[`ignition/fedora-workstation.bu`](ignition/fedora-workstation.bu) bootstraps
+[`ignition/antares.bu`](ignition/antares.bu) bootstraps
 an Incus Fedora CoreOS/uCore VM using the same pattern as the homelab server.
 It also configures Incus's 9p agent share and SELinux policy so `incus exec`
-continues working after reboot.
+continues working after reboot. GNOME RDP is configured automatically with a
+generated password stored in root-only
+`/etc/fedora-workstation-autorebase/rdp-credentials`.
 
 Generate strict Ignition JSON with:
 
 ```sh
 just ignition
 ```
+
+Run the complete disposable Incus installation test with:
+
+```sh
+just antares-vm-test
+```
+
+On its first run, this downloads a stable FCOS live ISO and caches it under
+`/tmp/antares-e2e`, recreates the `antares-e2e` VM, installs with
+`ignition/antares.ign`, waits through the automatic rebases, and verifies the
+finished workstation. Override the defaults with `ANTARES_INSTANCE`,
+`ANTARES_WORKDIR`, `ANTARES_CPUS`, `ANTARES_MEMORY`, `ANTARES_DISK_SIZE`,
+`ANTARES_TIMEOUT`, or `INCUS`.
+
+The full test is destructive to the configured `ANTARES_INSTANCE`. Its
+individual stages are available as `fcos-download`, `antares-vm-create`,
+`antares-vm-install`, `antares-vm-wait`, `antares-vm-status`,
+`antares-vm-console`, and `antares-vm-delete`. Set `INCUS=incus` when the
+current user can access Incus without `sudo`.
 
 The bootstrap then follows these stages:
 
@@ -169,74 +190,37 @@ The bootstrap then follows these stages:
 2. Rebase to the signed transport after the workstation image supplies its
    signing policy, then reboot again.
 3. Enable GDM autologin, SSH, and lingering for `offlinehq`.
-4. Wait for the autologged-in GNOME session and apply chezmoi using a
-   preseeded default config with every optional profile disabled.
+4. Wait for the autologged-in GNOME session, configure RDP, and apply chezmoi
+   using the preseeded VM config.
 
 Boot the VM from the official Fedora CoreOS ISO and install to its system disk
 using the generated Ignition file:
 
 ```sh
 sudo coreos-installer install \
-  -I https://raw.githubusercontent.com/xtruder/fedora-workstation/main/ignition/fedora-workstation.ign \
+  -I https://raw.githubusercontent.com/xtruder/fedora-workstation/main/ignition/antares.ign \
   /dev/sda
 ```
 
 Confirm the target disk with `lsblk` before running the installer. The
 autorebase state under `/etc/fedora-workstation-autorebase/` makes each stage
 idempotent across the required reboots. Initial chezmoi setup does not access
-1Password. Sign in to 1Password first, then set `hermes = true` in
-`~/.config/chezmoi/chezmoi.toml` and run `chezmoi apply`.
+1Password. Hermes service configuration is completed manually on the VM.
 Nested Incus configuration is also optional; set `incus = true` only on hosts
 that should receive the Incus network, storage pool, and profiles.
 
-For a disposable Incus test, attach an unmodified official Fedora CoreOS live
-ISO and use a disk of at least 10 GiB. The Ignition config assumes the standard
-FCOS `/dev/sda` partition layout and recreates the boot and root partitions on
-first boot. It expands `/boot` to 2 GiB because the workstation initramfs and
-the FCOS rollback deployment do not fit in FCOS's default 384 MiB partition.
-
-```sh
-FCOS_ISO=/tmp/fedora-coreos-live.iso
-
-incus init fedora-workstation-e2e --empty --vm \
-  -c limits.cpu=8 \
-  -c limits.memory=16GiB \
-  -c security.secureboot=false \
-  -d root,size=50GiB
-incus config device add fedora-workstation-e2e install disk \
-  source="$FCOS_ISO" \
-  boot.priority=10
-incus start fedora-workstation-e2e
-incus console fedora-workstation-e2e --type=vga
-```
-
-From the live environment, confirm the target with `lsblk`, then install:
-
-```sh
-sudo coreos-installer install \
-  -I https://raw.githubusercontent.com/xtruder/fedora-workstation/main/ignition/fedora-workstation.ign \
-  --console ttyS0,115200n8 \
-  --console tty0 \
-  /dev/sda
-```
-
-Stop the VM after installation, remove the ISO device, and start it from disk:
-
-```sh
-incus stop fedora-workstation-e2e --force
-incus config device remove fedora-workstation-e2e install
-incus start fedora-workstation-e2e
-incus console fedora-workstation-e2e
-```
-
-Do not use `coreos-installer iso ignition embed` for unattended installation:
-it configures the live environment but does not install the target disk. Use
-only a disposable VM name for this test. The VM reboots after each rebase, so
-temporary `incus exec` failures are expected. After the final reboot, verify
-`rpm-ostree status --booted`, `systemctl is-active incus-agent`, `findmnt
-/boot`, `findmnt /boot/efi`, and the state markers in
-`/etc/fedora-workstation-autorebase/`. The final `chezmoi` marker is created
-only after GDM has started an active Wayland session.
+The Incus test deliberately boots an unmodified official FCOS live ISO, pushes
+the generated Ignition into the live VM, and runs `coreos-installer install
+--offline` there. The Ignition config assumes the standard FCOS `/dev/sda`
+partition layout and recreates the boot and root partitions on first boot. It
+expands `/boot` to 2 GiB because the workstation initramfs and the FCOS rollback
+deployment do not fit in FCOS's default 384 MiB partition. Do not use
+`coreos-installer iso ignition embed`: it configures the live environment but
+does not install the target disk. Temporary `incus exec` failures are expected
+while the VM reboots between stages. `just antares-vm-status` verifies the
+signed deployment, system and RDP services, boot mounts, active session, and
+state markers. The final `chezmoi` marker is created only after GDM has started
+an active Wayland session.
 
 The preseeded `fs_type` must remain `xfs` for this FCOS layout. The Incus
 preseed selects a `dir` pool for non-Btrfs filesystems; setting `fs_type` to
@@ -316,8 +300,6 @@ inputs change:
   (`incus-preseed.yaml.tmpl`)
 - `run_onchange_after_10-install-hermes.sh.tmpl` — installs the pinned Hermes Agent,
   WebUI, and Cua Driver compatibility set when `hermes = true`
-- `run_onchange_after_20-configure-hermes.sh.tmpl` — reads the `Private/Hermes`
-  1Password item, configures RDP, and starts the optional user services
 
 ## Post-install setup
 

@@ -88,7 +88,7 @@
         "path": "/etc/hostname",
         "contents": {
           "compression": "",
-          "source": "data:,hermes-desktop"
+          "source": "data:,antares"
         },
         "mode": 420
       },
@@ -112,7 +112,7 @@
         },
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/0zMQQrCMBCF4X1PMXSvNyi4FK8gIo9mWsdkkpJMsL29xI1Zzvcz7+5geAxEEco00XiDB12rSz5IHAciVkho5Q2Py36yXB3nc2RrdSlPO7bf576UJhLnWmiiBaHwQPRJ2XfnnI/NUgcrVOLagdZgouwEHb44K/9nvwEAAP//QWZEyLcAAAA="
+          "source": "data:;base64,H4sIAAAAAAAC/0yLQcrCMBBG9z3FR/f/f4OCS/EKIjI00zomk5bJBNvbSwSxy/ce7xrI6dYBmZQxoL9QJJxrWGKS3HcAK0lq5UmRTtufWw1s/5m91ancfV8/5zaVZiSPtWDARKlwB7wWixjgVhuNtq++HPJMKnk+CK3JRTkI/a4Hm3L58jsAAP//RI0XE7QAAAA="
         },
         "mode": 384
       },
@@ -140,6 +140,15 @@
         "contents": {
           "compression": "gzip",
           "source": "data:;base64,H4sIAAAAAAAC/5xTy27bOhTc8yvm5hpJvKDVdtlEixY22iySAFECFEgMgxaPpAPQpMqHHbfovxdini4awOhO1JkZDofD//8rUvDFkm1Bdo2lCp0IFCEpOfTcU6PYCJFYl6Nj1pAJrmkMW+q+jwXbEJUxkBrSvQwg21eLOwEUnVtR8fyvmNTONtwWYRsirfQ+mCIF8nsDC02NSiZOovItxclG2Rj2Z0dekQ87ZCFar/qOa2UWgUJgZxc+Wcu2PR7jpwCMq5UBazyNE2tk155CFMCmY0PwpDSkfxN4Au0EAHCD21uM8qAsXyU6n+PwMEOADDk2rmVbR4PQuY18lMXBiPUBpOy968nHLa63PUHKtTKJxoPmRm2NsvrfFauo4q6kqiOvCfP5CWJH9lHUU0ze4l1eNiwA7SzhFKcvOxkO8WmnACmtk4ZasnosngXei19CJBvZDDZlhcIn+3Bno8S6WKbwcBi8eVuP+QZD1OODGHwIQfdUwyebw35dckiJ4WUM1fl6eT4r/+hPHnybfllc3Vxcn53PFtOzq3LXVIZMP99Ui2pWVWeXF4vh+9N0ejWrqjJZvv/Yq9iVfznKwBzeJGSNo4eGDklJmX2SVUtDOakN6o5+rBxLthwngfyaaxpyuMuR78dNvVaRJrn9R+J3AAAA//+uzUWhHAQAAA=="
+        },
+        "mode": 493
+      },
+      {
+        "overwrite": true,
+        "path": "/etc/fedora-workstation-autorebase/configure-rdp",
+        "contents": {
+          "compression": "gzip",
+          "source": "data:;base64,H4sIAAAAAAAC/6RV32/bNhB+519x1bQ6eaDlBVmD/tCAbDa2PCQprAQL0AYGLZ5szhSp8Cg7wtr/faBsxz/ioNuqB8Mkv7v77uPd8YdXSU0uGSuToJnDWNCUEXrgWFuoVIWFUJqxWsk0PlISeA22KLQyOH04ZrlDicYroWlUKI1pgj5PCpTWCb6wbkZeeGUNF7W3DseCMHGy4lt2zMlqJJVLk6ktMXlynnS1zYVOaCocJhNjS+QOS+uRS6SZtxVjqoBPn+AVcIJ4nwrc378HP0XDAOpS0Ax6Z2cMoBJEC+tCOrZCQ6TBCSOBB3JvTuHk9JgBbHvzZZXGR+XMY1lB9CxQ9679omDmnaig40rgxR7Sl1XUgcHdxQ0D+JsBAFROGV9AZ9j/OLrNBsOr88tB+uPDZ9PZSPwM+PE8y/68HvZXwChe5xMxgK/wy4GwDKCcH9g/kEu0zoEvqRaKka1djgexTBnyQmvgEngJvbNeD7jdkAc+2VpE8eqmo517W20mXlM3dx6+fDlwMMNm+z5dbWpCt1OMwDk8XSg+ADe4aH+CrSPx7rT39g1wKRqCs5MecGMlEvDHn3tv4XOrM6d6/BdEyXV6brxwSMlvV2l8NLXkjSjxOFrjbO036ayZP53OsHkOmGETBTnZxIlqqnKhR4REypqRq41RZnJ03NZFW/WgJKyPayWhzdYheQawmIbqdigkcPci8D1I29JZah23B2m6pdf9Pbx+3UIAWsiRthNlcq+BpnbBV24hipWMgPPK2Qqdb+CmqRA4nwtd43HwuRCNDi30vz1mXvhdlyL3ar7Tw+Fz6GtnoNcuC8UApDUIH+DDJpJW5NeRCDg3lmucoJGhP1cOfmJfGauNVzrQ5BkkrjZJkCiJayWTcU3LZODF21rpSxqxghMWeDCGj5i/WJxhvIYK+eP6crA/7NqDu/7vo+Ht1c3F5WDUvximu6RaSP/X22yUDbLs4vpqFP6f9/vDQZaltVGP7yrhp+mBVILlzpCJ4u1l9AR4Gi5LwHq5BISnAXgOnVb9CaH3ykwIwmth3aTbjujuajZ3d0d118kKvKbQGxDFQYJvz/dN33xHwByd/28RQysvIzoZCip4IvTbbxbsC7in1765VCTGGvlc4YJbo5uXAJV1nhucWK/ad3MfhybA/pUe62ZTUof8tGhWffNNw9whGhJzdGEYzfgyqIRCaFrGpoY8loEU522tLyFtty3gkLJdQjdXeTDvsH8CAAD//x1BgGt0CAAA"
         },
         "mode": 493
       }
@@ -217,6 +226,11 @@
         "contents": "[Unit]\nDescription=Initialize Fedora workstation dotfiles\nConditionPathExists=/etc/fedora-workstation-autorebase/signed\nConditionPathExists=/etc/fedora-workstation-autorebase/complete\nConditionPathExists=!/etc/fedora-workstation-autorebase/chezmoi\nAfter=network-online.target gdm.service fedora-workstation-bootstrap.service\nWants=network-online.target\n\n[Service]\nType=oneshot\nTimeoutStartSec=infinity\nExecStart=/etc/fedora-workstation-autorebase/initialize-chezmoi\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/chezmoi\nExecStart=/usr/bin/systemctl disable fedora-workstation-chezmoi.service\n\n[Install]\nWantedBy=multi-user.target\n",
         "enabled": true,
         "name": "fedora-workstation-chezmoi.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Configure GNOME Remote Desktop\nConditionPathExists=/etc/fedora-workstation-autorebase/complete\nConditionPathExists=!/etc/fedora-workstation-autorebase/rdp\nAfter=gdm.service fedora-workstation-bootstrap.service\n\n[Service]\nType=oneshot\nTimeoutStartSec=infinity\nExecStart=/etc/fedora-workstation-autorebase/configure-rdp\nExecStart=/usr/bin/touch /etc/fedora-workstation-autorebase/rdp\nExecStart=/usr/bin/systemctl disable fedora-workstation-rdp.service\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "fedora-workstation-rdp.service"
       }
     ]
   }
