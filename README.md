@@ -151,14 +151,12 @@ bluebuild build ./recipes/recipe.yml
 
 ## Incus VM bootstrap
 
-[`ignition/antares.bu`](ignition/antares.bu) bootstraps
-an Incus Fedora CoreOS/uCore VM using the same pattern as the homelab server.
+[`ignition/antares.bu`](ignition/antares.bu) bootstraps an Incus Fedora CoreOS
+VM using the same pattern as the homelab server.
 It also configures Incus's 9p agent share and SELinux policy so `incus exec`
-continues working after reboot. GNOME RDP is configured automatically with a
-generated password stored in root-only
-`/etc/fedora-workstation-autorebase/rdp-credentials`.
+continues working after reboot. GNOME RDP is optional and configured manually.
 
-Generate strict Ignition JSON with:
+Generate Ignition JSON with:
 
 ```sh
 just ignition
@@ -180,19 +178,19 @@ both Podman and Docker are installed.
 
 The full test is destructive to the configured `ANTARES_INSTANCE`. Its
 individual stages are available as `fcos-download`, `antares-installer-iso`,
-`antares-vm-create`, `antares-vm-install`, `antares-vm-wait`, `antares-vm-status`,
-`antares-vm-console`, and `antares-vm-delete`. Set `INCUS=incus` when the
-current user can access Incus without `sudo`.
+`antares-vm-create`, `antares-vm-install`, `antares-vm-wait`,
+`antares-vm-status`, `antares-vm-console`, and `antares-vm-delete`. Set
+`INCUS=incus` when the current user can access Incus without `sudo`.
 
 The bootstrap then follows these stages:
 
-1. Rebase from uCore to the unsigned
+1. Rebase from Fedora CoreOS to the unsigned
    `ghcr.io/xtruder/fedora-workstation:latest` deployment and reboot.
 2. Rebase to the signed transport after the workstation image supplies its
    signing policy, then reboot again.
 3. Enable GDM autologin, SSH, and lingering for `offlinehq`.
-4. Wait for the autologged-in GNOME session, configure RDP, and apply chezmoi
-   using the preseeded VM config.
+4. Wait for the autologged-in GNOME session and apply chezmoi using the
+   preseeded VM config.
 
 Boot the VM from the official Fedora CoreOS ISO and install to its system disk
 using the generated Ignition file:
@@ -210,18 +208,75 @@ idempotent across the required reboots. Initial chezmoi setup does not access
 Nested Incus configuration is also optional; set `incus = true` only on hosts
 that should receive the Incus network, storage pool, and profiles.
 
-The Incus test deliberately boots an unmodified official FCOS live ISO, pushes
-the generated Ignition into the live VM, and runs `coreos-installer install
---offline` there. The Ignition config assumes the standard FCOS `/dev/sda`
-partition layout and recreates the boot and root partitions on first boot. It
-expands `/boot` to 2 GiB because the workstation initramfs and the FCOS rollback
-deployment do not fit in FCOS's default 384 MiB partition. Do not use
-`coreos-installer iso ignition embed`: it configures the live environment but
-does not install the target disk. Temporary `incus exec` failures are expected
-while the VM reboots between stages. `just antares-vm-status` verifies the
-signed deployment, system and RDP services, boot mounts, active session, and
-state markers. The final `chezmoi` marker is created only after GDM has started
-an active Wayland session.
+The Incus test customizes the official FCOS live ISO with
+`coreos-installer iso customize --dest-device /dev/sda --dest-ignition ...`.
+An unmodified live FCOS VM does not run the Incus agent, so it cannot be
+provisioned with `incus file push` or `incus exec`. The customized ISO performs
+the installation unattended and applies `antares.ign` only to the destination
+system.
+
+After installation, `ignition/poweroff-after-install` powers off the live VM.
+The host then removes the high-priority `install` ISO device and starts the VM
+from its system disk. Keep this handoff deterministic: Incus has no boot-once
+ISO option, and removing the ISO immediately after `incus start` races the live
+system while it is still reading the media. Do not use `coreos-installer iso
+ignition embed`; that applies Ignition to the live environment but does not
+install the target disk.
+
+The Ignition config assumes the standard FCOS `/dev/sda` partition layout and
+recreates the boot and root partitions on first boot. It expands `/boot` to 2
+GiB because the workstation initramfs and the FCOS rollback deployment do not
+fit in FCOS's default 384 MiB partition. Temporary `incus exec` failures are
+expected while the installed VM reboots between stages. `just
+antares-vm-status` verifies the signed deployment, system services, boot
+mounts, active session, and state markers. The final `chezmoi` marker is created
+only after GDM has started an active Wayland session.
+
+### Optional GNOME RDP
+
+Use GNOME Remote Desktop's headless mode for this passwordless autologin VM.
+Ordinary `grdctl rdp set-credentials` uses GNOME Keyring and stalls because the
+locked `offlinehq` account has no persistent unlocked login keyring. Headless
+mode stores credentials in a TPM when available and otherwise uses a persistent
+key-file fallback.
+
+Run these commands as `offlinehq` in the VM:
+
+```sh
+install -d -m 0700 ~/.local/share/gnome-remote-desktop
+openssl req -new -newkey rsa:4096 -days 720 -nodes -x509 \
+  -subj "/O=Antares/CN=$(hostname)" \
+  -out ~/.local/share/gnome-remote-desktop/tls.crt \
+  -keyout ~/.local/share/gnome-remote-desktop/tls.key
+
+grdctl --headless rdp set-tls-key ~/.local/share/gnome-remote-desktop/tls.key
+grdctl --headless rdp set-tls-cert ~/.local/share/gnome-remote-desktop/tls.crt
+grdctl --headless rdp set-credentials
+grdctl --headless rdp disable-view-only
+grdctl --headless rdp disable-port-negotiation
+grdctl --headless rdp enable
+systemctl --user enable --now gnome-remote-desktop-headless.service
+```
+
+The message `Init TPM credentials failed because No TPM device found, using
+GKeyFile as fallback` is expected in an Incus VM without a virtual TPM. Verify
+the setup with `grdctl --headless status` and connect to the VM's IP on port
+3389. Headless mode creates an independent remote desktop rather than sharing
+the session shown by `incus console --type vga`.
+
+Antares also boots with `nousershstk`. Keep this argument while the VM uses an
+Incus host-passthrough CPU: affected KVM/QEMU combinations can expose CET
+shadow stacks incompatibly to the guest, causing PID 1 page faults with error
+codes `0x44` or `0x46` after GDM starts. These codes identify a shadow-stack
+fault rather than a GDM or ordinary stack-exhaustion failure. Preserve both
+`console=ttyS0,115200n8` and `console=tty0` when changing kernel arguments so
+serial and VGA diagnostics remain available.
+
+An `mcelog` failure stating that AMD processor family 25 is unsupported is a
+userspace tooling mismatch, not a reported machine-check event. `mcelog` does
+not decode this AMD family. Physical AMD hosts should use the kernel EDAC/MCE
+path with `rasdaemon`; an Incus guest can leave `mcelog` disabled because the
+host owns physical hardware-error reporting.
 
 The preseeded `fs_type` must remain `xfs` for this FCOS layout. The Incus
 preseed selects a `dir` pool for non-Btrfs filesystems; setting `fs_type` to
@@ -301,6 +356,8 @@ inputs change:
   (`incus-preseed.yaml.tmpl`)
 - `run_onchange_after_10-install-hermes.sh.tmpl` — installs the pinned Hermes Agent,
   WebUI, and Cua Driver compatibility set when `hermes = true`
+- `dot_config/autostart/ulauncher.desktop` — starts Ulauncher hidden through
+  XWayland when the graphical session begins
 
 ## Post-install setup
 

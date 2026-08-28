@@ -6,7 +6,7 @@ set -euo pipefail
 installer=$(mktemp)
 trap 'rm -f "$installer"' EXIT
 curl -fsSL \
-  https://raw.githubusercontent.com/NousResearch/hermes-agent/fcbd1076a93841fa88855acce810e342a5b78101/install.sh \
+  https://hermes-agent.nousresearch.com/install.sh \
   -o "$installer"
 bash "$installer" \
   --commit fcbd1076a93841fa88855acce810e342a5b78101 \

@@ -10,6 +10,9 @@
   `incus exec` remains available across the image rebases.
 - Preserve `console=ttyS0,115200n8` and `console=tty0`; the serial console is
   required for `incus console`, while `tty0` keeps VGA boot diagnostics.
+- Preserve `nousershstk` while Antares runs with an Incus host-passthrough CPU.
+  Some host KVM/QEMU combinations expose CET shadow stacks incorrectly, causing
+  PID 1 page faults with error codes `0x44` or `0x46` after GDM starts.
 - The disk configuration intentionally assumes FCOS's standard `/dev/sda`
   partition numbers and offsets. Keep `/boot` at 2 GiB: the default 384 MiB
   partition cannot hold both the FCOS and workstation deployments.
@@ -29,15 +32,21 @@
   and kernel-argument operations target an installed disk, and ISO embedding
   does not perform installation.
 - Preserve the proven Incus test path in the `antares-vm-*` Just recipes: boot
-  an unmodified FCOS live ISO, push `antares.ign`, run the offline
-  `coreos-installer install` inside the live VM, then detach the ISO. Use
-  `just antares-vm-test` for end-to-end validation; transient `incus exec`
-  failures are normal during the staged reboots.
-- Keep GNOME RDP provisioning in Ignition and independent from the optional
-  Hermes dotfiles. It must wait for the active Wayland user bus, retain the
-  generated login in root-only
-  `/etc/fedora-workstation-autorebase/rdp-credentials`, and create its stage
-  marker only after the user service is enabled successfully.
+  an unattended ISO produced by `coreos-installer iso customize` with
+  `--dest-device` and `--dest-ignition`. An unmodified FCOS live VM has no
+  Incus agent, so do not depend on `incus file push` or `incus exec` before the
+  destination system boots.
+- Keep `poweroff-after-install` in the customized ISO flow. The install media
+  has higher boot priority and Incus has no boot-once ISO option; poweroff lets
+  the host detach it before starting the installed disk. Do not replace this
+  with an immediate detach after `incus start`, which races live-media reads.
+- Use `just antares-vm-test` for end-to-end validation. Transient `incus exec`
+  failures are normal only after the installed system starts and reboots
+  through the staged rebases.
+- Keep RDP optional and out of the automated bootstrap. The passwordless GDM
+  autologin session has no persistent unlocked login keyring, so ordinary
+  `grdctl rdp set-credentials` stalls. Document `grdctl --headless` for manual
+  setup because that mode uses TPM storage or a persistent key-file fallback.
 - Keep the preseeded `fs_type` aligned with the installed root filesystem.
   This layout formats root as XFS, so use `xfs`; `btrfs` makes the Incus
   preseed select a Btrfs pool that cannot use the XFS-backed path.

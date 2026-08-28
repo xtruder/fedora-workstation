@@ -4,6 +4,13 @@ Set `hermes = true` in the local chezmoi config to install the pinned Hermes
 compatibility set and user service definitions. Configure Hermes secrets and
 start the services manually on the VM.
 
+The profile downloads the installer from the stable official endpoint,
+`https://hermes-agent.nousresearch.com/install.sh`, while `--commit` keeps the
+Agent version pinned. Do not use the former repository-root `install.sh` raw
+URL: upstream moved that file and the old URL returns 404. After updating the
+dotfile source, rerun `chezmoi apply`; the `run_onchange` template retries when
+its content changes.
+
 Create one item named `Hermes` in the `Private` vault with these fields:
 
 - `API_SERVER_KEY`

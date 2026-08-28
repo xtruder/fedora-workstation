@@ -117,7 +117,7 @@ antares-vm-install:
     {{ incus }} config device remove "{{ antares_instance }}" install
     {{ incus }} start "{{ antares_instance }}"
 
-# Wait through the rebases until chezmoi and RDP setup finish.
+# Wait through the rebases until chezmoi setup finishes.
 antares-vm-wait:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -125,8 +125,7 @@ antares-vm-wait:
     deadline=$((SECONDS + {{ antares_timeout }}))
     while ((SECONDS < deadline)); do
       if {{ incus }} exec "{{ antares_instance }}" -- \
-        test -e /etc/fedora-workstation-autorebase/chezmoi \
-             -a -e /etc/fedora-workstation-autorebase/rdp >/dev/null 2>&1; then
+        test -e /etc/fedora-workstation-autorebase/chezmoi >/dev/null 2>&1; then
         complete=true
         break
       fi
@@ -142,15 +141,9 @@ antares-vm-status:
     #!/usr/bin/env bash
     set -euo pipefail
     {{ incus }} exec "{{ antares_instance }}" -- sh -ceu '
-      uid=$(id -u offlinehq)
       rpm-ostree status --booted | grep -Fq "ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest"
       rpm-ostree status --booted
       systemctl is-active gdm.service incus-agent.service
-      runuser -u offlinehq -- env \
-        HOME=/home/offlinehq \
-        XDG_RUNTIME_DIR=/run/user/$uid \
-        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus \
-        systemctl --user is-active gnome-remote-desktop.service
       loginctl list-sessions --no-legend
       findmnt /boot
       findmnt /boot/efi
