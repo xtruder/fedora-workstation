@@ -171,15 +171,16 @@ just antares-vm-test
 ```
 
 On its first run, this downloads a stable FCOS live ISO and caches it under
-`/tmp/antares-e2e`, recreates the `antares-e2e` VM, installs with
-`ignition/antares.ign`, waits through the automatic rebases, and verifies the
+`data/`, builds an unattended installer from `ignition/antares.ign`, recreates
+the `antares` VM, waits through the automatic rebases, and verifies the
 finished workstation. Override the defaults with `ANTARES_INSTANCE`,
 `ANTARES_WORKDIR`, `ANTARES_CPUS`, `ANTARES_MEMORY`, `ANTARES_DISK_SIZE`,
-`ANTARES_TIMEOUT`, or `INCUS`.
+`ANTARES_TIMEOUT`, `CONTAINER_RUNTIME`, or `INCUS`. Podman is preferred when
+both Podman and Docker are installed.
 
 The full test is destructive to the configured `ANTARES_INSTANCE`. Its
-individual stages are available as `fcos-download`, `antares-vm-create`,
-`antares-vm-install`, `antares-vm-wait`, `antares-vm-status`,
+individual stages are available as `fcos-download`, `antares-installer-iso`,
+`antares-vm-create`, `antares-vm-install`, `antares-vm-wait`, `antares-vm-status`,
 `antares-vm-console`, and `antares-vm-delete`. Set `INCUS=incus` when the
 current user can access Incus without `sudo`.
 
