@@ -13,7 +13,7 @@ url={{ get . "url" | default "" | quote }}
 fallback_url={{ get . "fallbackUrl" | default "" | quote }}
 version_file="${destination}.version"
 
-# Check for a new release once per day: {{ now | date "2006-01-02" }}
+# Check for a new release once per week: {{ div (now | unixEpoch) 604800 }}
 if [[ -z "$version" || -z "$url" ]]; then
     if ! release=$(curl --fail --silent --show-error --location \
         --retry 5 --retry-all-errors --retry-delay 2 \
