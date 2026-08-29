@@ -192,6 +192,12 @@ The bootstrap then follows these stages:
 4. Wait for the autologged-in GNOME session and apply chezmoi using the
    preseeded VM config.
 
+Ignition removes FCOS's default `core` account before creating `offlinehq` with
+UID 1000 and `/home/offlinehq`. This identity is required by the GNOME session
+and Linuxbrew setup. `antares-vm-status` verifies both that UID assignment and
+that `core` no longer resolves. Recreating the VM is preferred over changing
+UIDs while an existing GNOME session is active.
+
 Boot the VM from the official Fedora CoreOS ISO and install to its system disk
 using the generated Ignition file:
 
@@ -360,6 +366,8 @@ inputs change:
   in `Brewfile` with Homebrew Bundle
 - `dot_config/traefik/` — configures the Hermes WebUI HTTPS route when
   `hermes_web = true`
+- `dot_config/autostart/hermes-browser.desktop.tmpl` — starts a visible
+  Google Chrome CDP browser in the GNOME session for Hermes WebUI
 - `dot_config/autostart/ulauncher.desktop` — starts Ulauncher hidden through
   XWayland when the graphical session begins
 
@@ -367,6 +375,8 @@ inputs change:
 The Homebrew run-on-change template streams it to `brew bundle`; its embedded
 checksum makes package-list edits trigger another install. Add shared Homebrew
 formulae there instead of creating one-off installer scripts.
+Homebrew GCC uses version-suffixed commands such as `gcc-<major>` and
+`g++-<major>` on Linux; set `CC` and `CXX` for builds that expect generic names.
 
 ## Post-install setup
 

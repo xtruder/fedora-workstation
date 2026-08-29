@@ -24,7 +24,10 @@ incus-preseed.sh
 {{ end }}
 
 {{ if not .hermes_web }}
+.config/autostart/hermes-browser.desktop
+.config/environment.d/hermes-browser.conf
 .config/traefik
 .config/systemd/user/hermes-webui.service
 .config/systemd/user/traefik.service
+.local/bin/hermes-browser
 {{ end }}

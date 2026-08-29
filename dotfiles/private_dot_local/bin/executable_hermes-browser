@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+app_id=com.google.Chrome
+profile="$HOME/.var/app/$app_id/config/hermes-cdp"
+
+mkdir -p "$profile"
+exec /usr/bin/flatpak run "$app_id" \
+  --remote-debugging-address=127.0.0.1 \
+  --remote-debugging-port=9222 \
+  --user-data-dir="$profile" \
+  --ozone-platform=wayland \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-blink-features=AutomationControlled \
+  about:blank

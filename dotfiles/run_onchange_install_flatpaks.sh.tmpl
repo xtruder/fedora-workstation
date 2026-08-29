@@ -67,6 +67,10 @@ multimedia=(
     com.github.iwalton3.jellyfin-media-player
 )
 
+hermes_web=(
+    com.google.Chrome
+)
+
 flatpaks=("${default[@]}")
 
 {{- if .work }}
@@ -83,6 +87,10 @@ flatpaks+=("${crypto[@]}")
 
 {{- if .gaming }}
 flatpaks+=("${gaming[@]}")
+{{- end }}
+
+{{- if .hermes_web }}
+flatpaks+=("${hermes_web[@]}")
 {{- end }}
 
 flatpak install --user --noninteractive --assumeyes flathub "${flatpaks[@]}"

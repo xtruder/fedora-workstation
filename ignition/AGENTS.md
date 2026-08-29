@@ -3,6 +3,11 @@
 - Treat `antares.bu` as the source of truth. Regenerate `antares.ign` with
   `just ignition` from the repository root and
   commit both files together.
+- Antares must have `offlinehq` as UID 1000 for the Linuxbrew/GNOME user. In
+  `passwd.users`, delete FCOS's default `core` account before creating
+  `offlinehq` with explicit UID 1000 and `/home/offlinehq`; array order matters
+  because Ignition applies user operations sequentially. Do not create both
+  accounts and accept UID 1001 for `offlinehq`.
 - Preserve the two-stage rebase: the first deployment must use the unsigned
   transport because the signing policy is supplied by the workstation image;
   only the following deployment can use the signed transport.
@@ -43,6 +48,9 @@
 - Use `just antares-vm-test` for end-to-end validation. Transient `incus exec`
   failures are normal only after the installed system starts and reboots
   through the staged rebases.
+- Keep the `antares-vm-status` assertions that `offlinehq` owns UID 1000 and
+  `core` no longer resolves. These can be checked on the first installed boot
+  without waiting for the later image rebases.
 - Keep RDP optional and out of the automated bootstrap. The passwordless GDM
   autologin session has no persistent unlocked login keyring, so ordinary
   `grdctl rdp set-credentials` stalls. Document `grdctl --headless` for manual

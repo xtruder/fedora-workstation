@@ -4,10 +4,18 @@ The profile has two options in the local chezmoi config:
 
 - `hermes = true` installs the Agent API, Cua Driver, and API user service.
 - `hermes_web = true` installs that complete Hermes profile plus the WebUI,
-  Traefik configuration, and disabled WebUI and Traefik user services.
+  Traefik configuration, visible Google Chrome browser, and disabled WebUI and
+  Traefik user services.
 
 When enabling `hermes_web`, also set `base_domain = "x-truder.net"`. The WebUI
 hostname is `web.hermes.<base_domain>`.
+
+The Hermes browser starts automatically in the existing GNOME Wayland session.
+It is a visible Google Chrome Flatpak with a dedicated profile and CDP on
+`127.0.0.1:9222`; it does not use Chrome's headless mode. The profile exports
+`BROWSER_CDP_URL`, causing Hermes to connect to this browser instead of starting
+its own headless browser. Log out and back in after first enabling the profile
+so GNOME autostart and the user environment both pick up the new files.
 
 The Agent API unit is enabled for either profile and reads
 `~/.config/hermes/services.env`. Create that file with the Agent API and
@@ -33,7 +41,9 @@ Agent version pinned. Do not use the former repository-root `install.sh` raw
 URL: upstream moved that file and the old URL returns 404. After updating the
 dotfile source, rerun `chezmoi apply`; the `run_onchange` template retries when
 its content changes. Cua Driver has no Homebrew formula or official tap, so the
-profile uses its pinned, checksum-verified upstream installer.
+profile uses its pinned, checksum-verified upstream installer. The Hermes
+installer runs with `--skip-browser`; browser tools use the visible Chrome CDP
+endpoint instead of downloading Playwright Chromium.
 
 Create one item named `Hermes` in the `Private` vault with these fields:
 
