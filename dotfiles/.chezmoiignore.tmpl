@@ -1,4 +1,7 @@
+AGENTS.md
 Brewfile
+dconf.ini
+incus-preseed.yaml
 
 {{ if not .work }}
 **/gpg-agent*.socket
@@ -14,7 +17,6 @@ install-ngrok.sh
 {{ end }}
 
 {{ if not .incus }}
-incus-preseed.yaml
 incus-preseed.sh
 {{ end }}
 

@@ -1,5 +1,13 @@
 # Dotfiles guidance
 
+- Keep every repository-only instruction, document, and helper input in
+  `.chezmoiignore.tmpl` so chezmoi does not install it into the home directory.
+  When adding a source file that is consumed with `include`, `includeTemplate`,
+  or directly from `.chezmoi.sourceDir` but is not itself a dotfile, add its
+  target path to the unconditional ignore list in the same change. This
+  currently includes `AGENTS.md`, `Brewfile`, `dconf.ini`, and
+  `incus-preseed.yaml.tmpl` (ignored as its target name,
+  `incus-preseed.yaml`).
 - Declare shared Homebrew formulae in `Brewfile`, not one-off `brew install`
   scripts. `Brewfile` is source-only; keep it in `.chezmoiignore.tmpl` and keep
   its checksum embedded in `run_onchange_install-brew-packages.sh.tmpl`.
