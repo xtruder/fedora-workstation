@@ -28,8 +28,9 @@ chmod 600 ~/.config/hermes/services.env
 
 The WebUI unit is installed but not enabled by chezmoi and does not load the
 Hermes environment file. It starts without password authentication by default;
-configure a password through the WebUI when desired. Enable the unit manually
-when ready:
+configure a password through the WebUI when desired. The unit is attached to
+`graphical-session.target`, inherits GNOME's `DISPLAY` and `WAYLAND_DISPLAY`,
+and explicitly enables the CUA Wayland backend. Enable it manually when ready:
 
 ```bash
 systemctl --user enable --now hermes-webui.service

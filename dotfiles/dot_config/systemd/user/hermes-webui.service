@@ -1,15 +1,17 @@
 [Unit]
 Description=Hermes WebUI
 Wants=network-online.target
-After=network-online.target hermes-api.service
+After=network-online.target graphical-session.target hermes-api.service
+PartOf=graphical-session.target
 
 [Service]
 Type=simple
 Environment=PATH=%h/.local/bin:%h/.hermes/bin:/usr/local/bin:/usr/bin
+Environment=CUA_DRIVER_RS_ENABLE_WAYLAND=1
 WorkingDirectory=%h/.hermes/hermes-webui
 ExecStart=/bin/bash %h/.hermes/hermes-webui/start.sh --foreground --no-browser
 Restart=on-failure
 RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
