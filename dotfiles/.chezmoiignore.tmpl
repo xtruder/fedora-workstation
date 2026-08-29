@@ -1,3 +1,5 @@
+Brewfile
+
 {{ if not .work }}
 **/gpg-agent*.socket
 **/code.desktop
@@ -16,9 +18,13 @@ incus-preseed.yaml
 incus-preseed.sh
 {{ end }}
 
-{{ if not .hermes }}
+{{ if not (or .hermes .hermes_web) }}
 .config/systemd/user/hermes-api.service
-.config/systemd/user/hermes-webui.service
 .config/systemd/user/graphical-session.target.wants/hermes-api.service
-.config/systemd/user/default.target.wants/hermes-webui.service
+{{ end }}
+
+{{ if not .hermes_web }}
+.config/traefik
+.config/systemd/user/hermes-webui.service
+.config/systemd/user/traefik.service
 {{ end }}

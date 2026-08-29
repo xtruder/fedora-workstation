@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Brewfile checksum: {{ include "Brewfile" | sha256sum }}
+/home/linuxbrew/.linuxbrew/bin/brew bundle --file=- <<'BREWFILE'
+{{ include "Brewfile" -}}
+BREWFILE

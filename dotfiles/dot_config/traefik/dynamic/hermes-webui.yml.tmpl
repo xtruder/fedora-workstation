@@ -1,0 +1,32 @@
+http:
+  routers:
+    hermes-webui:
+      rule: Host(`web.hermes.{{ .base_domain }}`)
+      entryPoints:
+        - websecure
+      service: hermes-webui-svc
+      tls:
+        certResolver: cloudflare
+      middlewares:
+        - hermes-security-headers
+        - hermes-rate-limit
+
+  services:
+    hermes-webui-svc:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8787"
+
+  middlewares:
+    hermes-security-headers:
+      headers:
+        stsSeconds: 31536000
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        frameDeny: true
+        sslRedirect: true
+    hermes-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50

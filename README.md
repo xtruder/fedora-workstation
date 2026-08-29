@@ -355,9 +355,18 @@ inputs change:
 - `run_onchange_incus-preseed.sh.tmpl` — applies an Incus preseed
   (`incus-preseed.yaml.tmpl`)
 - `run_onchange_after_10-install-hermes.sh.tmpl` — installs the pinned Hermes Agent,
-  WebUI, and Cua Driver compatibility set when `hermes = true`
+  WebUI, and Cua Driver compatibility set selected by `hermes` and `hermes_web`
+- `run_onchange_install-brew-packages.sh.tmpl` — installs the formulae declared
+  in `Brewfile` with Homebrew Bundle
+- `dot_config/traefik/` — configures the Hermes WebUI HTTPS route when
+  `hermes_web = true`
 - `dot_config/autostart/ulauncher.desktop` — starts Ulauncher hidden through
   XWayland when the graphical session begins
+
+`dotfiles/Brewfile` is source-only and excluded from chezmoi's target state.
+The Homebrew run-on-change template streams it to `brew bundle`; its embedded
+checksum makes package-list edits trigger another install. Add shared Homebrew
+formulae there instead of creating one-off installer scripts.
 
 ## Post-install setup
 
@@ -575,10 +584,11 @@ The `bling` module installs 1Password. Sign in, then ensure your browser
 is listed in `/etc/1password/custom_allowed_browsers` so the browser
 extension can talk to the desktop app.
 
-The optional Hermes profile requires desktop app CLI integration. Keep
-`hermes = false` during initial setup, sign in to 1Password, then enable the
-flag in the local chezmoi config and run `chezmoi apply`. The required item
-fields and manual Traefik examples are documented in
+The optional Hermes profiles require desktop app CLI integration. Keep
+`hermes = false` and `hermes_web = false` during initial setup, sign in to
+1Password, then enable the desired options and run `chezmoi apply`. Set
+`base_domain` when enabling `hermes_web`. The required item fields and Traefik
+setup are documented in
 [`examples/hermes/`](examples/hermes/).
 
 ### Nextcloud sync

@@ -1,0 +1,14 @@
+[Unit]
+Description=Traefik reverse proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/traefik/traefik.env
+ExecStart=/home/linuxbrew/.linuxbrew/bin/traefik --configFile=%h/.config/traefik/traefik.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

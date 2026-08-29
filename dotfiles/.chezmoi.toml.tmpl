@@ -8,6 +8,11 @@
 {{- $isGaming := promptBoolOnce . "gaming" "Do you want to enable gaming?" -}}
 {{- $isMultimedia := promptBoolOnce . "multimedia" "Do you want to enable multimedia?" -}}
 {{- $isHermes := promptBoolOnce . "hermes" "Do you want to enable Hermes?" -}}
+{{- $isHermesWeb := promptBoolOnce . "hermes_web" "Do you want to enable Hermes WebUI?" -}}
+{{- $baseDomain := "" -}}
+{{- if $isHermesWeb -}}
+{{-   $baseDomain = promptStringOnce . "base_domain" "Base domain for Hermes WebUI" -}}
+{{- end -}}
 
 [data]
   name = "{{ $name }}"
@@ -21,3 +26,7 @@
   gaming = {{ $isGaming }}
   multimedia = {{ $isMultimedia }}
   hermes = {{ $isHermes }}
+  hermes_web = {{ $isHermesWeb }}
+{{ if $isHermesWeb }}
+  base_domain = "{{ $baseDomain }}"
+{{ end }}
