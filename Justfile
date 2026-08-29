@@ -143,6 +143,9 @@ antares-vm-status:
     {{ incus }} exec "{{ antares_instance }}" -- sh -ceu '
       rpm-ostree status --booted | grep -Fq "ostree-image-signed:docker://ghcr.io/xtruder/fedora-workstation:latest"
       rpm-ostree status --booted
+      test "$(id -u offlinehq)" -eq 1000
+      ! getent passwd core
+      getent passwd offlinehq
       systemctl is-active gdm.service incus-agent.service
       loginctl list-sessions --no-legend
       findmnt /boot

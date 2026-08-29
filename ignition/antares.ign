@@ -12,14 +12,20 @@
   "passwd": {
     "users": [
       {
+        "name": "core",
+        "shouldExist": false
+      },
+      {
         "groups": [
           "wheel",
           "sudo"
         ],
+        "homeDir": "/home/offlinehq",
         "name": "offlinehq",
         "sshAuthorizedKeys": [
           "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBn3XS9FgqskCni3d8LIw20+vUutFK6F8P2wcjZVMbDJLtzQO194hXjQoveEN7RZ8EdiJBjme3r3XdwwoMcNQUgMSpGiFtD2oG3zoApFJf6y7T5P25PdZyK+Tlb2YySCLQ== (none)"
-        ]
+        ],
+        "uid": 1000
       }
     ]
   },
@@ -113,7 +119,7 @@
         },
         "contents": {
           "compression": "gzip",
-          "source": "data:;base64,H4sIAAAAAAAC/0yLQcrCMBBG9z3FR/f/f4OCS/EKIjI00zomk5bJBNvbSwSxy/ce7xrI6dYBmZQxoL9QJJxrWGKS3HcAK0lq5UmRTtufWw1s/5m91ancfV8/5zaVZiSPtWDARKlwB7wWixjgVhuNtq++HPJMKnk+CK3JRTkI/a4Hm3L58jsAAP//RI0XE7QAAAA="
+          "source": "data:;base64,H4sIAAAAAAAC/1yOQQqDMBBF955icN/eQOiy9AqlyGgmdppMIskE9fYlbrRd/vf48J4GFV8NQEAh6KB9oEO4FxOd59A2ACTIvpoPOrytF03FULoG0mpt7nWb9+dqcyUcxpKhA4s+UwOwxOSgA02lrjFts8aTnlA4TCcgxSsLGcbj9aYklP93v9BwsAEz9SYKcthrfkK/AQAA///UJVLV5wAAAA=="
         },
         "mode": 384
       },

@@ -9,7 +9,11 @@ kernel_arguments:
 
 passwd:
   users:
+    - name: core
+      should_exist: false
     - name: offlinehq
+      uid: 1000
+      home_dir: /home/offlinehq
       groups:
         - wheel
         - sudo
@@ -103,6 +107,8 @@ storage:
             gaming = false
             multimedia = true
             hermes = true
+            hermes_web = true
+            base_domain = "x-truder.net"
 
     - path: /etc/cil/run-incus_agent-incus--agent.cil
       overwrite: true
