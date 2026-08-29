@@ -31,6 +31,39 @@ printf '%s  %s\n' \
   "$installer" | sha256sum --check
 CUA_DRIVER_RS_VERSION=cua-driver-rs-v0.20.0 bash "$installer"
 
+# WinRects GNOME Shell extension (bundled in the cua-driver tarball): window
+# screen geometry + agent cursor on GNOME Mutter Wayland. Without it,
+# cua-driver captures hang on this headless GNOME Wayland session. Also
+# listed in dconf.ini enabled-extensions; GNOME Shell loads it at
+# session start.
+winrects_src="$HOME/.cua-driver/packages/current/wayland-helper/winrects@cua"
+if [[ -d "$winrects_src" ]]; then
+    winrects_dest="$HOME/.local/share/gnome-shell/extensions/winrects@cua"
+    mkdir -p "$winrects_dest"
+    cp -f "$winrects_src/metadata.json" "$winrects_src/extension.js" "$winrects_dest/"
+    winrects_cur=$(gsettings get org.gnome.shell enabled-extensions 2>/dev/null || echo "@as []")
+    python3 - "$winrects_cur" "winrects@cua" <<'PY'
+import ast
+import subprocess
+import sys
+
+cur, uuid = sys.argv[1], sys.argv[2]
+try:
+    enabled = ast.literal_eval(cur)
+except Exception:
+    enabled = []
+if not isinstance(enabled, list):
+    enabled = []
+if uuid not in enabled:
+    enabled.append(uuid)
+    subprocess.run(
+        ["gsettings", "set", "org.gnome.shell", "enabled-extensions", str(enabled)],
+        check=True,
+    )
+print("enabled-extensions ->", enabled)
+PY
+fi
+
 # The upstream installer owns this messaging unit. This profile uses its own
 # API-enabled unit so chezmoi remains authoritative.
 systemctl --user disable --now hermes-gateway.service 2>/dev/null || true

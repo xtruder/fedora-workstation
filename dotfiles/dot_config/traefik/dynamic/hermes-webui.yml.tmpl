@@ -1,7 +1,7 @@
 http:
   routers:
     hermes-webui:
-      rule: Host(`web.hermes.{{ .base_domain }}`)
+      rule: Host(`hermes.{{ .base_domain }}`)
       entryPoints:
         - websecure
       service: hermes-webui-svc
