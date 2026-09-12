@@ -146,9 +146,12 @@ modules:
       - firefox
       - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
 
+  - type: script
+    scripts:
+      - install-1password.sh
+
   - type: bling
     install:
-      - 1password
       - dconf-update-service
 
   - type: default-flatpaks@v1

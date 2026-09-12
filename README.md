@@ -54,7 +54,8 @@ The recipe runs these modules in order:
 | `files`             | Copies `files/system/*` into the image root (`/etc/...` config overlay)                  |
 | `script`            | Prunes orphaned kernel module trees left over from base image upgrades                   |
 | `rpm-ostree`        | Installs the main package set (see below) and removes stock Firefox                      |
-| `bling`             | Installs 1Password and a dconf-update service                                            |
+| `script`            | Installs 1Password and configures its privileged helpers                                 |
+| `bling`             | Installs a dconf-update service                                                          |
 | `default-flatpaks`  | Installs `org.mozilla.firefox`, `org.gnome.Loupe`; removes `org.gnome.eog`               |
 | `systemd`           | Enables usbguard, incus, powertop, tailscaled, tpm-hibernate-reset; disables flatpak timer |
 | `justfiles`         | Ships user-runnable `ujust` commands (see [below](#included-ujust-commands))             |
@@ -104,7 +105,7 @@ Removed: `firefox`, `firefox-langpacks` (replaced by the Flatpak).
 │   ├── rpm-ostree/        # Third-party .repo files
 │   ├── justfiles/         # ujust commands shipped with the image
 │   ├── systemd/           # (reserved for systemd unit overrides)
-│   └── scripts/           # (reserved for build-time scripts)
+│   └── scripts/           # Build-time scripts, including the 1Password installer
 ├── dotfiles/              # chezmoi source dir (see .chezmoiroot)
 ├── sysext/                # system-extension definitions (drata-agent, jcagent)
 ├── cosign.pub             # public key for image signing verification
