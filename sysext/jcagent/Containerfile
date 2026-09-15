@@ -1,4 +1,4 @@
-FROM fedora:40 as install
+FROM fedora:46 as install
 
 ARG TOKEN
 
