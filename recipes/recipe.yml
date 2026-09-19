@@ -33,8 +33,6 @@ modules:
   - type: rpm-ostree
     repos:
       - microsoft-vscode.repo
-      - tuxedo.repo
-      - tuxedo-drivers-kmod.repo
       - ghostty.repo
       - nordvpn.repo
       - bazzite.repo
@@ -190,7 +188,6 @@ modules:
     validate: true
     include:
       - akmod-keys.just
-      #- install-tuxedo.just
       - dotfiles.just
 
   - type: script

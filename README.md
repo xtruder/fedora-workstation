@@ -72,7 +72,7 @@ The `rpm-ostree` module installs (grouped by purpose):
   `procps`, `strace`, `bcc`, `zenity`, `make`, `gcc`, `python3-devel`,
   `python3-pip`, `python3-tkinter`, `python-systemd`, `gnupg2`,
   `rpmdevtools`, `smartmontools`, `acpica-tools`
-- **Kernel modules**: `akmods`, plus third-party repos (Tuxedo, bazzite,
+- **Kernel modules**: `akmods`, plus third-party repos (bazzite,
   ublue-os-akmods/staging, ghostty, nordvpn, vscode, cursor, windsurf,
   open-code)
 - **Power / hardware**: `powertop`, `fw-fanctrl`, `fw-ectool`, `ryzenadj`
@@ -644,12 +644,6 @@ system via `ujust`:
 | `ujust dotfiles`    | Initialize and apply chezmoi dotfiles from this repo (see [Dotfiles](#dotfiles))     |
 | `ujust akmods-keys` | Build and install the `akmods-keys` package for the running Fedora version           |
 | `ujust build-akmods-keys` | Build the `akmods-keys` RPM only (does not install)                            |
-| `ujust install-tuxedo` | Install Tuxedo Control Center + akmod-tuxedo-drivers and wire its autostart entry |
-
-> The `install-tuxedo` justfile is **not** included by the recipe by
-> default (it's commented out in `recipes/recipe.yml`). Enable it there
-> if you're running on Tuxedo hardware.
-
 ## CI
 
 [`.github/workflows/build.yml`](.github/workflows/build.yml) runs the
