@@ -1,4 +1,4 @@
-FROM docker.io/library/ubuntu:24.04 as install
+FROM docker.io/library/ubuntu:26.04 as install
 
 ADD Drata-agent-linux.deb /Drata-agent-linux.deb
 RUN apt update
