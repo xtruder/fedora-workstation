@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-nohup ~/.local/share/libexec/trezor-suite.AppImage "$@" > ~/.trezor_suite_log 2>&1 &
