@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONF=/etc/systemd/logind.conf.d/lidswitch.conf
+
+current=$(systemd-analyze cat-config systemd/logind.conf 2>/dev/null | awk -F= '/^[[:space:]]*HandleLidSwitch=/{print $2; exit}')
+current=${current:-suspend}
+
+if [[ "$current" == "suspend" ]]; then
+    printf '[Login]\nHandleLidSwitch=ignore\nHandleLidSwitchExternalPower=ignore\nHandleLidSwitchDocked=ignore\n' | sudo tee "$CONF" > /dev/null
+    state="OFF (lid close ignored)"
+else
+    printf '[Login]\nHandleLidSwitch=suspend\nHandleLidSwitchExternalPower=suspend\nHandleLidSwitchDocked=suspend\n' | sudo tee "$CONF" > /dev/null
+    state="ON (lid close suspends)"
+fi
+
+sudo systemctl reload systemd-logind
+echo "Lid suspension: $state"
